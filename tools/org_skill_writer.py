@@ -1,24 +1,8 @@
 """
-组织蒸馏 Skill 文件写入器。
+职场生存军师 Skill 文件写入器。
 
-负责将生成的 role_interfaces.md、info_flows.md、org_diagnosis.md
+负责将生成的 my_structural_reality.md、my_energy_drain.md、stay_or_leave_decision.md
 写入到标准目录结构，并生成 meta.json 与完整 SKILL.md。
-
-用法示例：
-    python3 tools/org_skill_writer.py --action create --slug biz-middle-platform \
-        --meta meta.json \
-        --interfaces role_interfaces.md \
-        --flows info_flows.md \
-        --diagnosis org_diagnosis.md \
-        --base-dir ./organizations
-
-    python3 tools/org_skill_writer.py --action update --slug biz-middle-platform \
-        --interfaces-patch interfaces_patch.md \
-        --flows-patch flows_patch.md \
-        --diagnosis-patch diagnosis_patch.md \
-        --base-dir ./organizations
-
-    python3 tools/org_skill_writer.py --action list --base-dir ./organizations
 """
 
 from __future__ import annotations
@@ -34,120 +18,122 @@ from typing import Optional
 
 
 SKILL_MD_TEMPLATE = """---
-name: organization_{slug}
-description: {name} 的组织信息流与权限结构分析 Skill
+name: survival_guide_{slug}
+description: {name} 的职场生态位与去留生存指南
 ---
 
-# {name}
+# {name} 职场生存指南
 
-## 分析范围
+## 侦察范围
 
-- **组织名称**：{name}
+- **组织/目标名称**：{name}
 - **分析边界**：{scope}
-- **用户位置**：{user_position}
-- **初始假设**：{org_hypothesis}
+- **我的当前位置**：{user_position}
+- **我的初始怀疑**：{org_hypothesis}
 
 ---
 
-## PART A：角色接口画像
+## PART A：我的真实生态位 (谁在吸血，我在替谁背锅？)
 
-{interfaces_content}
-
----
-
-## PART B：信息流画像
-
-{flows_content}
+{reality_content}
 
 ---
 
-## PART C：组织诊断
+## PART B：我的内耗与价值流 (我在做无用功吗？)
 
-{diagnosis_content}
+{energy_content}
 
 ---
 
-## 运行规则
+## PART C：去留决断 (赶紧跑还是继续苟？)
 
-接收到与该组织相关的问题时，按如下顺序处理：
+{decision_content}
 
-1. 先判断问题涉及哪个角色接口与哪个信息层。
-2. 再结合信息流路径分析信息从哪里来、在哪一层被压缩或损耗。
-3. 最后基于现有证据给出组织诊断，不要把结构问题轻易归因为个人品质问题。
-4. 若证据不足，必须明确指出“原材料不足”以及缺的是哪一类材料。
+---
+
+## 生存推演规则
+
+接收到与该环境相关的问题时，按如下“职场马基雅维利”原则处理：
+
+1. **禁用管理学黑话**：不要说“赋能、对齐、颗粒度”，直接翻译成“替人干活、陪人开会、细节背锅”。
+2. **利益绝对优先**：分析任何事情，只看“我”赚了（权力、经验、钱、闲）还是亏了（精力、情绪、背锅风险）。
+3. **识别真实权力**：谁能决定你的绩效？谁在拿你的成果邀功？指出真正的利益链条。
+4. **结论先行**：如果用户问“怎么办”，直接给出【苟着】、【提桶跑路】或【虚与委蛇】的明确策略及理由。
+5. **证据不足不乱猜**：如果材料看不出深浅，直接说“聊天记录不够，看不出这里面的水有多深”。
 """
 
 
-INTERFACES_ONLY_TEMPLATE = """---
-name: organization_{slug}_interfaces
-description: {name} 的角色接口画像
+REALITY_ONLY_TEMPLATE = """---
+name: survival_{slug}_reality
+description: {name} 的真实生态位画像
 ---
 
-{interfaces_content}
+{reality_content}
 """
 
 
-FLOWS_ONLY_TEMPLATE = """---
-name: organization_{slug}_flows
-description: {name} 的信息流画像
+ENERGY_ONLY_TEMPLATE = """---
+name: survival_{slug}_energy
+description: {name} 的内耗与价值流分析
 ---
 
-{flows_content}
+{energy_content}
 """
 
 
-DIAGNOSIS_ONLY_TEMPLATE = """---
-name: organization_{slug}_diagnosis
-description: {name} 的组织诊断
+DECISION_ONLY_TEMPLATE = """---
+name: survival_{slug}_decision
+description: {name} 的去留决断
 ---
 
-{diagnosis_content}
+{decision_content}
 """
 
 
-DEFAULT_INTERFACES = """# 角色接口画像
+DEFAULT_REALITY = """# 真实生态位画像
 
-## 当前状态
+## 当前探测状态
 
-原材料不足，尚未形成稳定的角色接口画像。
+**⚠️ 证据不足，无法定位你的真实生态位。**
 
-## 建议补充
+## 建议补充弹药
 
-优先补充能够体现“谁向谁输出什么”的材料，例如：
-
-- 任务分发记录
-- 跨部门对齐纪要
-- 汇报与评审材料
-- 群聊中的职责边界争议
+想知道你是不是“工具人”或者“背锅侠”？优先补充能够体现“谁在给你派活，你做完给了谁”的材料：
+- 领导给你派活的聊天截图
+- 跨部门扯皮、甩锅的群聊记录
+- 你的汇报对象对你工作成果的评价或修改意见
 """
 
 
-DEFAULT_FLOWS = """# 信息流画像
+DEFAULT_ENERGY = """# 内耗与价值流分析
 
-## 当前状态
+## 当前探测状态
 
-原材料不足，尚未形成稳定的信息流判断。
+**⚠️ 证据不足，无法计算你的精力损耗率。**
 
-## 建议补充
+## 建议补充弹药
 
-优先补充能够体现信息如何流动和压缩的材料，例如：
-
-- 决策传达链路
-- 多层级汇报记录
-- 会议纪要与后续执行偏差
-- 高层结论到执行层动作之间的转换记录
+想知道你的时间是不是被狗吃了？优先补充以下材料：
+- 没完没了的拉齐会议纪要
+- 流程审批卡点的截图
+- 领导朝令夕改的指令记录
+- 你每天高频对接的人的沟通记录
 """
 
 
-DEFAULT_DIAGNOSIS = """# 组织诊断
+DEFAULT_DECISION = """# 去留决断
 
-## 当前状态
+## 当前探测状态
 
-原材料不足，暂不对组织下结论。
+**⚠️ 证据不足，现在瞎建议你离职或留下都是害你。**
 
-## 初步判断原则
+## 决断核心原则
 
-在证据不足时，不要直接把低信息输出理解为个人无能，更可能是岗位接口、权限结构或信息传递机制造成的结果。
+别谈什么“公司愿景”和“团队氛围”。在补齐材料前，先问自己三个极其现实的问题：
+1. 在这里，我能赚到高于市场价的钱吗？
+2. 在这里，我能学到下家愿意高薪买单的本事吗？
+3. 在这里，我能攒下以后用得着的靠谱人脉吗？
+（如果都是 NO，你其实心里已经有答案了）
 """
 
 
@@ -169,16 +155,16 @@ def ensure_text(path: Optional[str], default: str) -> str:
     return Path(path).read_text(encoding="utf-8").strip() or default
 
 
-def render_skill_md(meta: dict, slug: str, interfaces_content: str, flows_content: str, diagnosis_content: str) -> str:
+def render_skill_md(meta: dict, slug: str, reality_content: str, energy_content: str, decision_content: str) -> str:
     return SKILL_MD_TEMPLATE.format(
         slug=slug,
         name=meta.get("name", slug),
         scope=meta.get("scope", "未指定"),
         user_position=meta.get("user_position", "未指定"),
         org_hypothesis=meta.get("org_hypothesis", "暂无"),
-        interfaces_content=interfaces_content,
-        flows_content=flows_content,
-        diagnosis_content=diagnosis_content,
+        reality_content=reality_content,
+        energy_content=energy_content,
+        decision_content=decision_content,
     )
 
 
@@ -186,9 +172,9 @@ def create_skill(
     base_dir: Path,
     slug: str,
     meta: dict,
-    interfaces_content: str,
-    flows_content: str,
-    diagnosis_content: str,
+    reality_content: str,
+    energy_content: str,
+    decision_content: str,
 ) -> Path:
     org_dir = base_dir / slug
     org_dir.mkdir(parents=True, exist_ok=True)
@@ -203,24 +189,25 @@ def create_skill(
     ):
         (org_dir / subdir).mkdir(parents=True, exist_ok=True)
 
-    (org_dir / "role_interfaces.md").write_text(interfaces_content + "\n", encoding="utf-8")
-    (org_dir / "info_flows.md").write_text(flows_content + "\n", encoding="utf-8")
-    (org_dir / "org_diagnosis.md").write_text(diagnosis_content + "\n", encoding="utf-8")
+    # 【核心改动】修改了输出的文件名
+    (org_dir / "my_structural_reality.md").write_text(reality_content + "\n", encoding="utf-8")
+    (org_dir / "my_energy_drain.md").write_text(energy_content + "\n", encoding="utf-8")
+    (org_dir / "stay_or_leave_decision.md").write_text(decision_content + "\n", encoding="utf-8")
 
-    skill_md = render_skill_md(meta, slug, interfaces_content, flows_content, diagnosis_content)
+    skill_md = render_skill_md(meta, slug, reality_content, energy_content, decision_content)
     (org_dir / "SKILL.md").write_text(skill_md + "\n", encoding="utf-8")
 
     name = meta.get("name", slug)
-    (org_dir / "interfaces_skill.md").write_text(
-        INTERFACES_ONLY_TEMPLATE.format(slug=slug, name=name, interfaces_content=interfaces_content) + "\n",
+    (org_dir / "reality_skill.md").write_text(
+        REALITY_ONLY_TEMPLATE.format(slug=slug, name=name, reality_content=reality_content) + "\n",
         encoding="utf-8",
     )
-    (org_dir / "flows_skill.md").write_text(
-        FLOWS_ONLY_TEMPLATE.format(slug=slug, name=name, flows_content=flows_content) + "\n",
+    (org_dir / "energy_skill.md").write_text(
+        ENERGY_ONLY_TEMPLATE.format(slug=slug, name=name, energy_content=energy_content) + "\n",
         encoding="utf-8",
     )
-    (org_dir / "diagnosis_skill.md").write_text(
-        DIAGNOSIS_ONLY_TEMPLATE.format(slug=slug, name=name, diagnosis_content=diagnosis_content) + "\n",
+    (org_dir / "decision_skill.md").write_text(
+        DECISION_ONLY_TEMPLATE.format(slug=slug, name=name, decision_content=decision_content) + "\n",
         encoding="utf-8",
     )
 
@@ -238,14 +225,15 @@ def create_skill(
 def backup_current_version(org_dir: Path, version: str) -> None:
     version_dir = org_dir / "versions" / version
     version_dir.mkdir(parents=True, exist_ok=True)
+    # 【核心改动】修改了备份追踪的文件名
     for file_name in (
         "SKILL.md",
-        "role_interfaces.md",
-        "info_flows.md",
-        "org_diagnosis.md",
-        "interfaces_skill.md",
-        "flows_skill.md",
-        "diagnosis_skill.md",
+        "my_structural_reality.md",
+        "my_energy_drain.md",
+        "stay_or_leave_decision.md",
+        "reality_skill.md",
+        "energy_skill.md",
+        "decision_skill.md",
         "meta.json",
     ):
         src = org_dir / file_name
@@ -271,9 +259,9 @@ def append_patch(current: str, patch: Optional[str]) -> str:
 
 def update_skill(
     org_dir: Path,
-    interfaces_patch: Optional[str] = None,
-    flows_patch: Optional[str] = None,
-    diagnosis_patch: Optional[str] = None,
+    reality_patch: Optional[str] = None,
+    energy_patch: Optional[str] = None,
+    decision_patch: Optional[str] = None,
 ) -> str:
     meta_path = org_dir / "meta.json"
     if not meta_path.exists():
@@ -283,31 +271,32 @@ def update_skill(
     current_version = meta.get("version", "v1")
     backup_current_version(org_dir, current_version)
 
-    interfaces_content = append_patch((org_dir / "role_interfaces.md").read_text(encoding="utf-8"), interfaces_patch)
-    flows_content = append_patch((org_dir / "info_flows.md").read_text(encoding="utf-8"), flows_patch)
-    diagnosis_content = append_patch((org_dir / "org_diagnosis.md").read_text(encoding="utf-8"), diagnosis_patch)
+    # 【核心改动】修改了更新时读取的文件名
+    reality_content = append_patch((org_dir / "my_structural_reality.md").read_text(encoding="utf-8"), reality_patch)
+    energy_content = append_patch((org_dir / "my_energy_drain.md").read_text(encoding="utf-8"), energy_patch)
+    decision_content = append_patch((org_dir / "stay_or_leave_decision.md").read_text(encoding="utf-8"), decision_patch)
 
-    (org_dir / "role_interfaces.md").write_text(interfaces_content.rstrip() + "\n", encoding="utf-8")
-    (org_dir / "info_flows.md").write_text(flows_content.rstrip() + "\n", encoding="utf-8")
-    (org_dir / "org_diagnosis.md").write_text(diagnosis_content.rstrip() + "\n", encoding="utf-8")
+    (org_dir / "my_structural_reality.md").write_text(reality_content.rstrip() + "\n", encoding="utf-8")
+    (org_dir / "my_energy_drain.md").write_text(energy_content.rstrip() + "\n", encoding="utf-8")
+    (org_dir / "stay_or_leave_decision.md").write_text(decision_content.rstrip() + "\n", encoding="utf-8")
 
     slug = meta.get("slug", org_dir.name)
     name = meta.get("name", slug)
 
     (org_dir / "SKILL.md").write_text(
-        render_skill_md(meta, slug, interfaces_content, flows_content, diagnosis_content).rstrip() + "\n",
+        render_skill_md(meta, slug, reality_content, energy_content, decision_content).rstrip() + "\n",
         encoding="utf-8",
     )
-    (org_dir / "interfaces_skill.md").write_text(
-        INTERFACES_ONLY_TEMPLATE.format(slug=slug, name=name, interfaces_content=interfaces_content).rstrip() + "\n",
+    (org_dir / "reality_skill.md").write_text(
+        REALITY_ONLY_TEMPLATE.format(slug=slug, name=name, reality_content=reality_content).rstrip() + "\n",
         encoding="utf-8",
     )
-    (org_dir / "flows_skill.md").write_text(
-        FLOWS_ONLY_TEMPLATE.format(slug=slug, name=name, flows_content=flows_content).rstrip() + "\n",
+    (org_dir / "energy_skill.md").write_text(
+        ENERGY_ONLY_TEMPLATE.format(slug=slug, name=name, energy_content=energy_content).rstrip() + "\n",
         encoding="utf-8",
     )
-    (org_dir / "diagnosis_skill.md").write_text(
-        DIAGNOSIS_ONLY_TEMPLATE.format(slug=slug, name=name, diagnosis_content=diagnosis_content).rstrip() + "\n",
+    (org_dir / "decision_skill.md").write_text(
+        DECISION_ONLY_TEMPLATE.format(slug=slug, name=name, decision_content=decision_content).rstrip() + "\n",
         encoding="utf-8",
     )
 
@@ -346,17 +335,20 @@ def list_organizations(base_dir: Path) -> list[dict]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="组织蒸馏 Skill 文件写入器")
+    parser = argparse.ArgumentParser(description="职场生存军师 Skill 文件写入器")
     parser.add_argument("--action", required=True, choices=["create", "update", "list"])
     parser.add_argument("--slug", help="组织 slug（用于目录名）")
     parser.add_argument("--name", help="组织名称")
     parser.add_argument("--meta", help="meta.json 文件路径")
-    parser.add_argument("--interfaces", help="role_interfaces.md 文件路径")
-    parser.add_argument("--flows", help="info_flows.md 文件路径")
-    parser.add_argument("--diagnosis", help="org_diagnosis.md 文件路径")
-    parser.add_argument("--interfaces-patch", help="role_interfaces.md 增量内容文件路径")
-    parser.add_argument("--flows-patch", help="info_flows.md 增量内容文件路径")
-    parser.add_argument("--diagnosis-patch", help="org_diagnosis.md 增量内容文件路径")
+    
+    # 【核心改动】修改了命令行参数名，使其与新结构对应
+    parser.add_argument("--reality", help="my_structural_reality.md 文件路径")
+    parser.add_argument("--energy", help="my_energy_drain.md 文件路径")
+    parser.add_argument("--decision", help="stay_or_leave_decision.md 文件路径")
+    parser.add_argument("--reality-patch", help="my_structural_reality.md 增量内容")
+    parser.add_argument("--energy-patch", help="my_energy_drain.md 增量内容")
+    parser.add_argument("--decision-patch", help="stay_or_leave_decision.md 增量内容")
+    
     parser.add_argument("--base-dir", default="./organizations", help="组织 Skill 根目录")
 
     args = parser.parse_args()
@@ -365,9 +357,9 @@ def main() -> None:
     if args.action == "list":
         organizations = list_organizations(base_dir)
         if not organizations:
-            print("暂无已创建的组织 Skill")
+            print("暂无已建立的档案")
             return
-        print(f"已创建 {len(organizations)} 个组织 Skill：\n")
+        print(f"已建立 {len(organizations)} 份生存档案：\n")
         for item in organizations:
             updated = item["updated_at"][:10] if item["updated_at"] else "未知"
             print(f"  [{item['slug']}]  {item['name']}")
@@ -387,12 +379,12 @@ def main() -> None:
             sys.exit(1)
 
         slug = args.slug or slugify(name)
-        interfaces_content = ensure_text(args.interfaces, DEFAULT_INTERFACES)
-        flows_content = ensure_text(args.flows, DEFAULT_FLOWS)
-        diagnosis_content = ensure_text(args.diagnosis, DEFAULT_DIAGNOSIS)
+        reality_content = ensure_text(args.reality, DEFAULT_REALITY)
+        energy_content = ensure_text(args.energy, DEFAULT_ENERGY)
+        decision_content = ensure_text(args.decision, DEFAULT_DECISION)
 
-        org_dir = create_skill(base_dir, slug, meta, interfaces_content, flows_content, diagnosis_content)
-        print(f"✅ 组织 Skill 已创建：{org_dir}")
+        org_dir = create_skill(base_dir, slug, meta, reality_content, energy_content, decision_content)
+        print(f"✅ 生存档案已建立：{org_dir}")
         print(f"   触发词：/{slug}")
         return
 
@@ -402,16 +394,16 @@ def main() -> None:
             sys.exit(1)
         org_dir = base_dir / args.slug
         if not org_dir.exists():
-            print(f"错误：找不到组织 Skill 目录 {org_dir}", file=sys.stderr)
+            print(f"错误：找不到档案目录 {org_dir}", file=sys.stderr)
             sys.exit(1)
 
         new_version = update_skill(
             org_dir,
-            interfaces_patch=args.interfaces_patch,
-            flows_patch=args.flows_patch,
-            diagnosis_patch=args.diagnosis_patch,
+            reality_patch=args.reality_patch,
+            energy_patch=args.energy_patch,
+            decision_patch=args.decision_patch,
         )
-        print(f"✅ 组织 Skill 已更新到 {new_version}：{org_dir}")
+        print(f"✅ 档案已更新到 {new_version}：{org_dir}")
         return
 
 
