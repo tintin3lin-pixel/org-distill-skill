@@ -43,8 +43,8 @@
 | --- | --- | --- |
 | 第一步 | fork 或复制这个仓库，作为你自己的版本 | 你有了一个可以自由修改的组织蒸馏工作台 |
 | 第二步 | 把你的材料放进 `organizations/<your-org>/evidence/` | 项目拿到组织运转的原始证据 |
-| 第三步 | 跑一遍分析脚本 | 原始材料被整理成线程、关系、信号和结构假设 |
-| 第四步 | 查看输出，继续补材料、补判断 | 你会逐步看清组织怎么流转，以及你在里面的位置 |
+| 第三步 | 跑一遍分析链路 | 原始材料被整理成线程、关系、信号和结构假设 |
+| 第四步 | 继续生成最终结论层输出 | 你会得到易读摘要、结构化去留判断和证据映射 |
 
 ## 你的数据应该放哪
 
@@ -85,6 +85,7 @@ python3 tools/thread_reconstructor.py --org-dir samples/anonymized-minimal
 python3 tools/noise_filter.py --org-dir samples/anonymized-minimal
 python3 tools/relationship_mapper.py --org-dir samples/anonymized-minimal
 python3 tools/latent_structure_inferer.py --org-dir samples/anonymized-minimal
+python3 tools/final_report_generator.py --org-dir samples/anonymized-minimal
 ```
 
 如果你已经准备好换成自己的数据，把上面的 `samples/anonymized-minimal` 改成你自己的组织目录，比如：
@@ -96,13 +97,21 @@ python3 tools/thread_reconstructor.py --org-dir organizations/your-org
 python3 tools/noise_filter.py --org-dir organizations/your-org
 python3 tools/relationship_mapper.py --org-dir organizations/your-org
 python3 tools/latent_structure_inferer.py --org-dir organizations/your-org
+python3 tools/final_report_generator.py --org-dir organizations/your-org
 ```
 
-跑完之后，你会看到一组中间结果和分析产物。它们不是“命运判决书”，而是组织蒸馏的证据底稿：哪些线程在反复断裂，谁总是拥有上下文，谁总是在传话，谁承担结果但没有对应权限，哪些结构是表面组织图里看不出来的。
+跑完之后，你会同时看到一组中间结果和四个最终输出文件。它们仍然不是“命运判决书”，而是把组织蒸馏过程收束成更容易消费的结论层：哪些线程在反复断裂，谁总是拥有上下文，谁总是在传话，谁承担结果但没有对应权限，以及当前更接近“继续修”还是“准备撤退”的保守判断。
 
 ## 你最终能得到什么
 
-这个项目最有价值的地方，不是给你一个漂亮结论，而是让你对很多原本只能凭感觉说的话，开始有证据地说出来。
+这个项目最有价值的地方，不是给你一个漂亮结论，而是让你对很多原本只能凭感觉说的话，开始有证据地说出来。现在它已经不只停留在中间产物层，而是会把这些判断继续收束成一组可以直接阅读、展示和程序化消费的最终输出。
+
+| 最终你会读到的东西 | 作用 |
+| --- | --- |
+| `outputs/analysis_report.md` | 查看严谨版组织诊断报告 |
+| `outputs/readable_brief.md` | 快速读懂一句话判词、你的位置和留走倾向 |
+| `outputs/stay_leave_assessment.json` | 让 Agent、前端或工作流读取结构化结论 |
+| `outputs/evidence_trace.json` | 回看关键判断到底对应了哪些证据 |
 
 | 最终你可能看清的东西 | 典型表现 |
 | --- | --- |
@@ -126,7 +135,7 @@ python3 tools/latent_structure_inferer.py --org-dir organizations/your-org
 
 当前版本是一个**可 fork、可试跑、可继续改写的 v0.x 开源原型**。
 
-它已经足够让你把自己的材料接进来，跑出第一轮组织蒸馏结果；但它还不是那种“上传一个压缩包，立刻生成完美报告”的消费级产品。如果你想要的是一个能自己继续改、能接 Agent、能接前端、能接工作流的开源骨架，那它已经进入能直接公开协作的状态。
+它已经足够让你把自己的材料接进来，跑出第一轮组织蒸馏结果，并继续生成一套保守但可直接消费的最终结论层输出；但它还不是那种“上传一个压缩包，立刻生成完美报告”的消费级产品。如果你想要的是一个能自己继续改、能接 Agent、能接前端、能接工作流的开源骨架，那它已经进入能直接公开协作的状态。
 
 ## 从哪里继续看
 

@@ -10,8 +10,8 @@
 | --- | --- | --- |
 | 原始材料吸收 | 是 | 可以把多类粗糙材料统一纳入同一目录协议 |
 | 中间产物生成 | 是 | 可以形成 `evidence_units`、线程、信号、关系和结构假设 |
-| 最终自然语言报告 | 部分成熟 | 建议由上层 Agent 或人工基于中间产物继续收束 |
-| 一键终局真相 | 否 | 当前版本不承诺也不应该承诺 |
+| 最终结论层输出 | 是 | 可以继续生成 `analysis_report.md`、`readable_brief.md`、`stay_leave_assessment.json` 与 `evidence_trace.json` |
+| 一键终局真相 | 否 | 当前版本给的是保守结论，不是绝对裁决 |
 
 ## 二、最快的试跑方式
 
@@ -67,7 +67,7 @@ samples/anonymized-minimal/
 
 ## 四、运行最小分析链路
 
-在仓库根目录执行以下命令。当前最小链路以 `tools/` 目录下现有六个脚本为准，下面的命令与实际文件名和命令行参数保持一致。[4]
+在仓库根目录执行以下命令。当前最小链路已经不只停在中间产物，而是会在第七步继续生成最终结论层输出。下面的命令与实际文件名和命令行参数保持一致。[4]
 
 ```bash
 python3 tools/evidence_indexer.py \
@@ -96,6 +96,9 @@ python3 tools/latent_structure_inferer.py \
   --relation-input samples/anonymized-minimal/derived/relationship_map.json \
   --score-input samples/anonymized-minimal/derived/signal_scores.json \
   --output samples/anonymized-minimal/derived/latent_hypotheses.json
+
+python3 tools/final_report_generator.py \
+  --org-dir samples/anonymized-minimal
 ```
 
 ## 五、第一次跑完后，应该检查什么
@@ -109,10 +112,19 @@ python3 tools/latent_structure_inferer.py \
 | `derived/signal_scores.json` | 高分单元与解释因子 | 噪音与高价值片段有区分 |
 | `derived/relationship_map.json` | 请求、汇报、升级、阻塞边 | 协作结构开始变得可观察 |
 | `derived/latent_hypotheses.json` | 假设文本与支撑证据 | 已形成第一版保守组织判断 |
+| `outputs/readable_brief.md` | 一句话判词、位置判断、留走倾向 | 已得到面向普通用户的最终摘要 |
+| `outputs/stay_leave_assessment.json` | recommendation、confidence、next_actions | 已得到可供外部系统消费的结构化结论 |
 
 ## 六、如果你想继续写成报告或 Skill
 
-当前公开版本最成熟的是**分析骨架**，而不是全自动报告生成器。更推荐的做法是：先把五类 JSON 中间产物跑出来，再让上层 Agent 或人工根据这些产物生成报告、摘要或组织画像。[1] [3]
+当前公开版本已经补上了一个**保守的最终结论层**。也就是说，外部用户或其他 Agent 不必只停在五类 JSON 中间产物上；在跑完主链路后，可以直接读取 `outputs/` 目录中的四个最终输出文件，用于阅读、展示、自动化分支或继续写成组织画像。[1] [3]
+
+| 输出文件 | 用途 | 更适合谁读 |
+| --- | --- | --- |
+| `outputs/analysis_report.md` | 严谨版分析报告 | 研究者、开发者、复核者 |
+| `outputs/readable_brief.md` | 易读版摘要 | 普通用户、前端界面 |
+| `outputs/stay_leave_assessment.json` | 结构化去留判断 | 工作流、Agent、程序化消费方 |
+| `outputs/evidence_trace.json` | 结论到证据的映射 | 审查、质检、解释性展示 |
 
 如果你已经有稳定的解释层文稿，也可以继续调用：
 
@@ -128,6 +140,8 @@ python3 tools/org_skill_writer.py \
   --base-dir ./organizations
 ```
 
+如果你要在自己的私有目录上完整跑一遍，把上面的 `samples/anonymized-minimal` 换成 `organizations/your-org` 即可，最终也会在 `organizations/your-org/outputs/` 下生成同名文件。
+
 ## 七、最常见的三种误用
 
 第一次接触这个项目时，最容易出现的不是命令报错，而是预期错位。下面这三类误用，建议直接避开。[3] [5]
@@ -135,8 +149,8 @@ python3 tools/org_skill_writer.py \
 | 误用方式 | 为什么不对 | 更合理的做法 |
 | --- | --- | --- |
 | 只给几句情绪吐槽就想出结论 | 材料不足，无法形成局部工作场景 | 至少补一段关键对话或一份任务分派记录 |
-| 把输出当事实裁决 | 当前输出是保守组织假设，不是最终真相 | 把它用于复盘、研究、协作讨论 |
-| 跳过中间产物直接读自然语言结论 | 会失去可解释性和二次开发空间 | 优先阅读五类 JSON 产物 |
+| 把输出当事实裁决 | 当前输出是保守组织诊断，不是最终真相 | 把它用于复盘、研究、协作讨论 |
+| 只读最终摘要，不看结构证据 | 会失去可解释性，也不利于继续补料 | 至少交叉检查 `latent_hypotheses.json` 与 `evidence_trace.json` |
 
 ## 八、接下来该读什么
 

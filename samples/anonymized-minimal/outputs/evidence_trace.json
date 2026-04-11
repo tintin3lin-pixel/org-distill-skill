@@ -1,0 +1,63 @@
+{
+  "generated_at": "2026-04-11T12:30:32.502682+00:00",
+  "organization_slug": "anonymized-minimal",
+  "claims": [
+    {
+      "claim_id": "claim_001",
+      "claim": "现有材料已经暴露出推进与决策之间存在明显接口摩擦。",
+      "supporting_evidence": [
+        {
+          "evidence_ref": "decision:evidence/decisions/task_split_md",
+          "source_path": "evidence/decisions/task_split.md",
+          "source_type": "decision",
+          "excerpt": "# 任务分派记录（脱敏样例）\n\n## 本周试点拆分\n\n| 事项 | 表面责任人 | 实际依赖 | 当前状态 |\n| --- | --- | --- | --- |\n| 汇总版本范围 | 我 | 需要产品接口B补背景、项目负责人A确认取舍 | 进行中 |\n| 明确需求优先级 | 项目负责人A | 需要结合资源与目标判断 | 待确认 |\n| 评估研发排期 | 研"
+        },
+        {
+          "evidence_ref": "message:evidence/messages/group_chat_excerpt_csv",
+          "source_path": "evidence/messages/group_chat_excerpt.csv",
+          "source_type": "message",
+          "excerpt": "日期,时间,发送者,内容\n2026-03-11,09:12,项目负责人A,这周要把试点方案定下来，先别展开太多分支。\n2026-03-11,09:18,产品接口B,我先把需求背景补一下，不过具体优先级还是要看研发排期。\n2026-03-11,09:24,我,那今天能不能先定一个 owner，不然大家都在等别人确认。\n2026-03-11,09:31,研发负责"
+        }
+      ],
+      "boundary_note": "该结果是基于现有材料形成的保守组织诊断，不构成 HR、法律、绩效、纪律或人格判断依据。"
+    },
+    {
+      "claim_id": "claim_002",
+      "claim": "中间产物能形成初步结构假设，但不足以稳定确认深层权责结构。",
+      "supporting_evidence": [
+        {
+          "evidence_ref": "decision:evidence/decisions/task_split_md",
+          "source_path": "evidence/decisions/task_split.md",
+          "source_type": "decision",
+          "excerpt": "# 任务分派记录（脱敏样例）\n\n## 本周试点拆分\n\n| 事项 | 表面责任人 | 实际依赖 | 当前状态 |\n| --- | --- | --- | --- |\n| 汇总版本范围 | 我 | 需要产品接口B补背景、项目负责人A确认取舍 | 进行中 |\n| 明确需求优先级 | 项目负责人A | 需要结合资源与目标判断 | 待确认 |\n| 评估研发排期 | 研"
+        },
+        {
+          "evidence_ref": "message:evidence/messages/group_chat_excerpt_csv",
+          "source_path": "evidence/messages/group_chat_excerpt.csv",
+          "source_type": "message",
+          "excerpt": "日期,时间,发送者,内容\n2026-03-11,09:12,项目负责人A,这周要把试点方案定下来，先别展开太多分支。\n2026-03-11,09:18,产品接口B,我先把需求背景补一下，不过具体优先级还是要看研发排期。\n2026-03-11,09:24,我,那今天能不能先定一个 owner，不然大家都在等别人确认。\n2026-03-11,09:31,研发负责"
+        }
+      ],
+      "boundary_note": "该结果是基于现有材料形成的保守组织诊断，不构成 HR、法律、绩效、纪律或人格判断依据。"
+    },
+    {
+      "claim_id": "claim_003",
+      "claim": "当前材料尚不足以稳定推断隐性组织结构。",
+      "supporting_evidence": [
+        {
+          "evidence_ref": "decision:evidence/decisions/task_split_md",
+          "source_path": "evidence/decisions/task_split.md",
+          "source_type": "decision",
+          "excerpt": "# 任务分派记录（脱敏样例）\n\n## 本周试点拆分\n\n| 事项 | 表面责任人 | 实际依赖 | 当前状态 |\n| --- | --- | --- | --- |\n| 汇总版本范围 | 我 | 需要产品接口B补背景、项目负责人A确认取舍 | 进行中 |\n| 明确需求优先级 | 项目负责人A | 需要结合资源与目标判断 | 待确认 |\n| 评估研发排期 | 研"
+        },
+        {
+          "evidence_ref": "message:evidence/messages/group_chat_excerpt_csv",
+          "source_path": "evidence/messages/group_chat_excerpt.csv",
+          "source_type": "message",
+          "excerpt": "日期,时间,发送者,内容\n2026-03-11,09:12,项目负责人A,这周要把试点方案定下来，先别展开太多分支。\n2026-03-11,09:18,产品接口B,我先把需求背景补一下，不过具体优先级还是要看研发排期。\n2026-03-11,09:24,我,那今天能不能先定一个 owner，不然大家都在等别人确认。\n2026-03-11,09:31,研发负责"
+        }
+      ],
+      "boundary_note": "该结果是基于现有材料形成的保守组织诊断，不构成 HR、法律、绩效、纪律或人格判断依据。"
+    }
+  ]
+}

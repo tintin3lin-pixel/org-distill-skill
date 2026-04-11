@@ -1,0 +1,35 @@
+{
+  "generated_at": "2026-04-11T12:30:32.502580+00:00",
+  "organization_slug": "anonymized-minimal",
+  "organization_name": "Anonymized Demo Org",
+  "recommendation": "observe_and_collect_more",
+  "recommendation_label": "先观察别上头",
+  "confidence": "low",
+  "title": "现在先别急着给这家公司判死刑",
+  "verdict": "这套材料已经能说明你在承担组织摩擦，但还不足以下终局判断。",
+  "user_position": "中间缓冲层",
+  "user_position_note": "你承担了推进和对齐压力，但不一定握有稳定拍板权。",
+  "reasoning": [
+    "现有材料已经暴露出推进与决策之间存在明显接口摩擦。",
+    "中间产物能形成初步结构假设，但不足以稳定确认深层权责结构。",
+    "当前材料尚不足以稳定推断隐性组织结构。"
+  ],
+  "key_risks": [
+    "材料覆盖面偏窄，容易把局部场景误当成整体组织常态。"
+  ],
+  "next_actions": [
+    "补充更接近拍板、分工、排障和复盘的材料。",
+    "优先加入至少一轮完整会议纪要与对应任务分派记录。",
+    "继续观察你是否长期承担解释、催办和兜底角色。"
+  ],
+  "sufficient_for_final_verdict": false,
+  "boundary_note": "该结果是基于现有材料形成的保守组织诊断，不构成 HR、法律、绩效、纪律或人格判断依据。",
+  "evidence_summary": {
+    "evidence_count": 4,
+    "thread_count": 3,
+    "relation_count": 0,
+    "hypothesis_count": 1,
+    "average_signal_score": 21.43,
+    "escalated_threads": 2
+  }
+}
