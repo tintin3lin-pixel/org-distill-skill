@@ -1,49 +1,47 @@
-# 文档总览
+# Documentation
 
-`docs/` 目录不再承担内部协作备忘的角色，而是专门服务于**公开仓库的外部阅读与二次开发**。如果你是第一次来到这个项目，可以把这里理解成一张中文导航页：先看必读，再按需要深入。
+`docs/` 里放方法文档、输出契约和接入说明。先跑样例，再按需要查对应文件。
 
-## 一、对外必读
+## Start here
 
-下面这些文档，适合第一次接触项目、准备试跑样例、或打算把它接入自己 Agent / 工作流的开发者优先阅读。
+第一次进入仓库，先看下面这几份。
 
-| 文档 | 作用 | 适合谁 |
+| 文档 | 用途 | 适合谁 |
 | --- | --- | --- |
-| [`../README.md`](../README.md) | 项目首页，回答“这是什么、为什么要做、怎么开始” | 所有人 |
-| [`../QUICKSTART.md`](../QUICKSTART.md) | 用公开脱敏样例跑通最小链路的最快路径 | 第一次试跑的人 |
-| [`../SKILL.md`](../SKILL.md) | 把仓库当成 Skill 接入 Agent 时的主入口 | Agent 开发者、集成方 |
-| [`../samples/README.md`](../samples/README.md) | 说明公开样例是什么、能做什么、不能代表什么 | 首次使用者 |
-| [`EXTERNAL_AGENT_ADAPTATION.md`](./EXTERNAL_AGENT_ADAPTATION.md) | 说明如何接入其他 Agent 或工作流系统 | 集成方 |
-| [`KNOWN_LIMITS_AND_MISREADINGS.md`](./KNOWN_LIMITS_AND_MISREADINGS.md) | 说明项目边界、误用风险与公开版不承诺的能力 | 所有人 |
+| [`../README.md`](../README.md) | 了解项目定位、输入输出和目录结构 | 所有人 |
+| [`../QUICKSTART.md`](../QUICKSTART.md) | 用公开样例快速试跑 | 第一次使用者 |
+| [`../SKILL.md`](../SKILL.md) | 按 Skill 方式接入仓库 | Agent 开发者、集成方 |
+| [`../samples/README.md`](../samples/README.md) | 查看公开样例的范围和限制 | 第一次使用者 |
+| [`EXTERNAL_AGENT_ADAPTATION.md`](./EXTERNAL_AGENT_ADAPTATION.md) | 了解外部 Agent 或工作流接入方式 | 集成方 |
+| [`KNOWN_LIMITS_AND_MISREADINGS.md`](./KNOWN_LIMITS_AND_MISREADINGS.md) | 查看已知局限和常见误读 | 所有人 |
 
-## 二、深入参考
+## Build and integration
 
-当你已经理解项目定位，准备做二次开发、前端承接或协议消费时，再进入下面这些文档会更合适。
+跑通主链路后，继续看下面这些文件。
 
-| 文档 | 作用 | 适合谁 |
+| 文档 | 用途 | 适合谁 |
 | --- | --- | --- |
-| [`DIAGNOSIS_OUTPUT_CONTRACT.md`](./DIAGNOSIS_OUTPUT_CONTRACT.md) | 定义组织诊断输出层的目标、双层输出原则与表达边界 | 需要消费结果的开发者 |
-| [`STANDARD_OUTPUT_CONTRACT_EXAMPLE.md`](./STANDARD_OUTPUT_CONTRACT_EXAMPLE.md) | 用标准化样例说明外部系统应优先读取哪些中间产物 | 做二次开发或工作流消费的人 |
-| [`FRONTEND_EXPRESSION_GUIDE.md`](./FRONTEND_EXPRESSION_GUIDE.md) | 说明前端或表达层如何把结构判断写得清楚、克制、可传播 | 前端、产品、内容层开发者 |
-| [`CHAT_CSV_COMPATIBILITY_VALIDATION.md`](./CHAT_CSV_COMPATIBILITY_VALIDATION.md) | 记录聊天 CSV 标准化兼容修复的验证结论 | 处理导出材料兼容性的人 |
-| [`ORG_DISTILL_FRAMEWORK_V2.md`](./ORG_DISTILL_FRAMEWORK_V2.md) | 解释当前组织蒸馏方法的分析框架与判断骨架 | 想理解方法论的人 |
+| [`DIAGNOSIS_OUTPUT_CONTRACT.md`](./DIAGNOSIS_OUTPUT_CONTRACT.md) | 定义诊断输出层结构和边界 | 结果消费方、后端开发者 |
+| [`STANDARD_OUTPUT_CONTRACT_EXAMPLE.md`](./STANDARD_OUTPUT_CONTRACT_EXAMPLE.md) | 提供标准输出样例 | 二次开发者、工作流集成方 |
+| [`FRONTEND_EXPRESSION_GUIDE.md`](./FRONTEND_EXPRESSION_GUIDE.md) | 说明前端和表达层如何展示结果 | 前端、产品、内容层开发者 |
+| [`ORG_DISTILL_FRAMEWORK_V2.md`](./ORG_DISTILL_FRAMEWORK_V2.md) | 说明当前分析框架 | 需要理解方法的人 |
 
-## 三、这个目录里不再放什么
+## Reading order
 
-为了让仓库可以直接切换为 public，`docs/` 目录不再保留以下类型的文件：
+如果你只是想判断仓库能不能用，按下面顺序读。
 
-| 不再保留的内容 | 原因 |
+| 顺序 | 文档 | 目的 |
+| --- | --- | --- |
+| 1 | [`../README.md`](../README.md) | 先看输入、输出和目录结构 |
+| 2 | [`../QUICKSTART.md`](../QUICKSTART.md) | 跑通公开样例 |
+| 3 | [`../SKILL.md`](../SKILL.md) | 了解 Skill 接入方式 |
+| 4 | [`EXTERNAL_AGENT_ADAPTATION.md`](./EXTERNAL_AGENT_ADAPTATION.md) | 设计外部 Agent 接入 |
+| 5 | 输出契约与框架文档 | 做产品化、接前端或二次开发 |
+
+## What is in this directory
+
+| 类型 | 你会看到什么 |
 | --- | --- |
-| 内部发布计划、上线清单、下一步行动备忘 | 这类信息对外部开发者帮助有限，且容易暴露协作过程痕迹 |
-| 一次性实验 runbook、个人工作草稿 | 更适合留在私有协作空间，而不是公开仓库主干 |
-| 通用脚手架英文占位文档 | 会制造语言割裂感，也会降低项目完成度观感 |
-
-## 四、建议阅读顺序
-
-如果你只是想快速判断这个项目是否值得 fork，可以按下面顺序阅读。
-
-1. 先看 [`../README.md`](../README.md)
-2. 再看 [`../QUICKSTART.md`](../QUICKSTART.md)
-3. 如果要接入 Agent，再看 [`../SKILL.md`](../SKILL.md) 与 [`EXTERNAL_AGENT_ADAPTATION.md`](./EXTERNAL_AGENT_ADAPTATION.md)
-4. 如果要做产品化或二次开发，再看输出契约与深入参考文档
-
-这套分层的目的只有一个：**让公开仓库先回答外部开发者真正关心的问题，再把更深的实现与方法论留给需要的人继续读。**
+| 接入说明 | `EXTERNAL_AGENT_ADAPTATION.md` 等接入文档 |
+| 输出契约 | 输出字段、样例和消费方式 |
+| 方法文档 | 当前分析框架和已知限制 |
