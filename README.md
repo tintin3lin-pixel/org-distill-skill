@@ -1,101 +1,75 @@
 # pmf-org-distill-skill
 
-**pmf-org-distill-skill** 是一个把 [colleague-skill][1] 从“识人”扩展到“识组织”的工程仓库。你也可以把它理解为一套面向真实职场协作现场的**组织生态位诊断骨架**：它不只是判断某个人像不像某种风格，而是试图从聊天记录、会议纪要、评审意见、任务记录和项目文档中，提炼出组织真实运转时暴露出来的 **信息接口**、**关系链路**、**权限边界** 与 **隐性结构**。
+**pmf-org-distill-skill** 不是又一个“同事分析器”或“老板吐槽器”。它更像一套面向真实工作痕迹的**组织反向蒸馏 Skill**：从群聊、会议纪要、任务分派、用户自述、零散文档里，反推一个组织究竟如何传递信息、如何形成决策、谁在掌握上下文、谁在承担缓冲，以及你自己到底处在这个系统的什么位置。[1]
 
-这个项目背后的核心判断是：很多低信息、低质量、令人疲惫的协作输出，并不一定只是某个人能力不足，也可能是**岗位接口只暴露了低信息版本**，或者组织在传递、拍板与执行的过程中持续发生上下文损耗。因此，本仓库的目标不是做抽象管理学评论，而是尽量把“谁真正掌握背景、谁只在传声、谁承担执行却拿不到上下文、谁在反复升级和阻塞”拆成可回溯的分析链。
+这也是它和市面上大量“个人版同事 Skill”“老板画像 Skill”最不一样的地方。别人是在给一个人贴标签，我们是在试着把一群人背后的**协作结构**翻出来。别人回答的是“这个人是不是难搞”，我们更关心的是：**为什么这个组织总在这个接口上失真，为什么某些人永远在补位，为什么有的人看起来有权，实际只是传话筒。**
 
-## 项目当前定位
+| 维度 | 常见个人版 Skill | pmf-org-distill-skill |
+| --- | --- | --- |
+| 分析对象 | 某个同事、某个老板 | 一个组织、一个团队、一个项目协作链 |
+| 输入材料 | 主观描述为主 | 群聊、会议、决策记录、文档、自述等混合证据 |
+| 输出目标 | 性格判断、相处建议 | 组织结构、信息接口、权力路径、角色位置、留熬逃建议 |
+| 结论方式 | 倾向直觉归因 | 尽量回到证据与结构解释 |
+| 适用场景 | 情绪疏导、关系判断 | 组织诊断、协作问题排查、职场策略判断 |
 
-当前版本不是完整产品，而是一个正在从 MVP 走向 **V2 分析框架** 的工程骨架。与早期只依赖 Prompt 直接读材料并输出结论的方式相比，V2 的重点是在“原材料”和“最终诊断”之间补出一层真正关键的**中间分析层**：先把原始证据标准化，再重建讨论线程，过滤闲聊噪音，抽取组织关系边，最后才做隐性结构推断。
+## 一、这个项目现在到底能不能用
 
-这意味着当前仓库希望稳定回答的，已经不只是“这个人像不像”，而是下面这些更接近组织现实的问题。
+可以用，但更准确的说法是：**它已经是一个可运行、可验证、可复用的 Skill 原型**，而不是完全产品化的一键式 SaaS。当前仓库已经具备从原始证据到中间结构产物的最小闭环，能稳定吸收多类材料，并在真实群聊样本上完成标准化、线程重建、信号评分、关系映射和隐性结构推断。[2][3]
 
-| 分析维度 | 要回答的核心问题 |
-|---|---|
-| 信息接口 | 哪些岗位真正掌握上下文，哪些岗位只暴露接口表层 |
-| 关系链路 | 谁向谁请求、汇报、升级、拍板、阻塞，真实协作如何发生 |
-| 信息流 | 关键判断从哪里来，经过哪些环节被翻译、压缩、损耗 |
-| 权限结构 | 谁能做决定，谁只能解释决定，谁负责执行却拿不到背景 |
-| 组织症状 | 低信息输出究竟是个人问题、岗位问题，还是组织结构问题 |
-| 隐性结构 | 对话里没有直接说出来的 owner 缺口、决策集中、协同成本和可见性断层在哪里 |
+如果你问“这个东西能不能真拿来分析一个团队”，答案是**能**。如果你问“它是不是已经到了任何人零配置、零判断、双击就出结论的程度”，答案是**还没有**。当前版本最适合的定位，是面向研究者、内容创作者、组织观察者、以及具备执行命令能力的 Agent 开发者的 **v0.x 开源 Skill**。
 
-## 参考与结构映射
+| 能力层 | 当前状态 | 说明 |
+| --- | --- | --- |
+| 原始材料吸收 | 可用 | 已支持 docs / messages / meetings / decisions / snapshots，多类粗糙输入可并存 |
+| 群聊 CSV 兼容 | 可用 | 已补齐聊天类 CSV 的标准化吸收逻辑，可进入官方链路 |
+| 中间分析链路 | 可用 | 可产出 `evidence_units`、`thread_map`、`signal_scores`、`relationship_map`、`latent_hypotheses` |
+| 最终解释层 | 可用但仍偏原型 | 适合在中间产物基础上生成分析报告，但报告模板和口径还可继续收束 |
+| 跨 Agent 复用 | 有条件可用 | 适合能读 `SKILL.md`、执行命令、管理目录与 JSON 的 Agent |
+| 普通用户一键使用 | 暂未完成 | 仍需要 README、样例、说明文档和最小操作能力支撑 |
 
-本项目直接继承了 `titanwings/colleague-skill` 的部分结构设计与写入器思路，但目标层已经发生根本改写。[1]
+## 二、它适合谁，不适合谁
 
-| colleague-skill | pmf-org-distill-skill | 改写逻辑 |
-|---|---|---|
-| `work.md` | `role_interfaces.md` | 从“个人如何干活”改成“岗位向外暴露什么接口、掌握哪层信息” |
-| `persona.md` | `org_diagnosis.md` | 从“人物风格”改成“组织症状、权限结构、接口问题与风险判断” |
-| 合并后的角色 skill | 合并后的组织 skill | 从“调用某个人”改成“解释某个组织切片” |
-| `knowledge/` | `evidence/` | 从个人材料归档改成组织证据归档 |
-| `colleagues/{slug}` | `organizations/{slug}` | 每个组织切片单独成目录 |
+这个仓库适合两类人。第一类，是想把“职场直觉”变成“组织证据”的人：你不满足于只说公司乱、老板烂、同事难搞，而是想弄清楚这个局为什么会这样。第二类，是想把这种能力封装成可复用流程的 Agent 开发者：你希望 Agent 能基于真实材料，做一轮结构化而不是情绪化的组织诊断。
 
-## V2 的关键升级
+它**不适合**被当成最终裁决器。它不能替你做 HR 调查，不能替你下法律判断，也不能在证据极少时假装看透一切。当前版本更像一套“组织侦察骨架”：它负责把隐约感觉拆成证据、关系和假设，而不是制造一种夸张的全知视角。[1][4]
 
-V1 的主要问题并不在于“分析写得不够多”，而在于直接从表层材料跳到表层判断。V2 引入的关键升级，是在“原材料”和“最终结论”之间补出一条可追溯的分析链。
+## 三、为什么值得发布
 
-| V2 模块 | 作用 | 当前状态 |
-|---|---|---|
-| `tools/models.py` | 定义证据、线程、关系边、信号评分和隐性假设的统一数据结构 | 已实现 |
-| `tools/evidence_normalizer.py` | 将多类原材料统一标准化为 `EvidenceUnit` | 已实现基础版 |
-| `tools/thread_reconstructor.py` | 将消息类材料按时间、主题和上下文重建为可分析线程 | 已实现基础版 |
-| `tools/noise_filter.py` | 为证据和线程打上核心信号、辅助信号、闲聊噪音和歧义标签 | 已实现基础版 |
-| `tools/relationship_mapper.py` | 从线程中抽取请求、汇报、升级、拍板、阻塞等组织关系边 | 已实现基础版 |
-| `tools/latent_structure_inferer.py` | 基于线程、关系和评分，保守地产出可追溯组织假设 | 已实现基础版 |
-| `tools/evidence_indexer.py` | 扫描证据目录并生成索引与来源统计 | 已实现 |
-| `tools/org_skill_writer.py` | 创建、更新、列出组织 skill 目录与产物 | 已实现 |
+如果今天开源世界里到处都是“个人版同事 Skill”“老板 Skill”“办公室人格分析器”，那我们更想补的是另一个空白：**有没有一种 Skill，不是把所有问题都归到个体人格，而是去反向蒸馏一个组织系统。**
 
-这意味着当前仓库已经具备一个更合理的分析顺序：**先整理证据，再理解关系，最后才做组织判断**。
+换句话说，我们想开源的不是一句“你的老板控制欲很强”，而是一条更有用的问题链：
 
-## 当前目录结构
+> 这个组织的真实决策权分布在哪里？信息在哪一层被折损？谁在承担上下文翻译成本？谁看似在负责，实际没有拍板权？你以为自己在解决执行问题，还是其实在承受结构问题？
 
-当前仓库围绕 `prompts/`、`tools/`、`organizations/` 与 `docs/` 四个核心目录展开。
+这就是这个项目的发布意义。它不是帮人发泄，而是帮人把发泄变成分析；不是替人贴标签，而是把组织运转这件事，尽量还原成一个可以讨论、可以复盘、也可以被其他 Agent 复用的 Skill。
 
-```text
-pmf-org-distill-skill/
-├── SKILL.md
-├── README.md
-├── ARCHITECTURE.md
-├── TODO.md
-├── ENGINEERING_GUIDELINES.md
-├── prompts/
-│   ├── intake.md
-│   ├── role_interface_analyzer.md
-│   ├── info_flow_analyzer.md
-│   ├── org_diagnosis_analyzer.md
-│   ├── thread_reconstruction_analyzer.md
-│   ├── latent_structure_inferer.md
-│   ├── interface_builder.md
-│   ├── flow_builder.md
-│   ├── diagnosis_builder.md
-│   ├── merger.md
-│   └── correction_handler.md
-├── tools/
-│   ├── models.py
-│   ├── evidence_indexer.py
-│   ├── evidence_normalizer.py
-│   ├── thread_reconstructor.py
-│   ├── noise_filter.py
-│   ├── relationship_mapper.py
-│   ├── latent_structure_inferer.py
-│   ├── org_skill_writer.py
-│   └── version_manager.py
-├── organizations/
-│   └── .gitkeep
-├── references/
-├── docs/
-└── scripts/
-```
+## 四、仓库里现在有什么
 
-其中，`tools/` 是当前最核心的工程目录，因为 V2 的主要价值就在于把“分析过程”从口头原则落成可接力的中间产物。
+当前公开版本的核心由两层组成。第一层是**分析链路**，用于把原始材料转成结构化中间产物。第二层是**Skill 表达层**，用于把分析结果写回成可供 Agent 调用的组织诊断文件。[1][2]
 
-## 组织目录约定
+| 目录 / 文件 | 作用 |
+| --- | --- |
+| `tools/evidence_indexer.py` | 建立证据索引并更新 `meta.json` 统计 |
+| `tools/evidence_normalizer.py` | 将原始材料标准化为统一证据单元 |
+| `tools/thread_reconstructor.py` | 将证据单元重建为线程上下文 |
+| `tools/noise_filter.py` | 对证据和线程进行信号评分 |
+| `tools/relationship_mapper.py` | 抽取请求、汇报、协调、阻塞等关系边 |
+| `tools/latent_structure_inferer.py` | 推断隐性组织结构假设 |
+| `tools/org_skill_writer.py` | 将分析结果写入结构化 Skill 文件 |
+| `tools/version_manager.py` | 管理版本、回滚和归档 |
+| `organizations/{slug}/` | 每个组织或项目的工作目录 |
+| `docs/` | 实验说明、发布说明、后续计划等配套文档 |
 
-每个组织切片都应落在 `organizations/{slug}/` 下。按照我们当前的协作分工，**我负责代码、接口、Prompt 和文档，你负责把真实材料放到正确位置**。只要目录结构稳定，后续流程就能持续复用。
+## 五、Quickstart：第一次怎么跑
+
+如果你想让外部试用者真的能从零开始，最重要的不是“讲理念”，而是给出一条**第一次就能照抄的最小路径**。下面这套 Quickstart，就是当前版本建议直接放进发布页的最小使用方式。
+
+### 1. 准备一个组织目录
+
+在仓库根目录下新建一个组织目录，例如 `organizations/demo-team/`。
 
 ```text
-organizations/{slug}/
+organizations/demo-team/
 ├── meta.json
 ├── evidence/
 │   ├── docs/
@@ -104,96 +78,215 @@ organizations/{slug}/
 │   ├── decisions/
 │   └── snapshots/
 ├── normalized/
-│   └── evidence_units.json
 ├── derived/
-│   ├── thread_map.json
-│   ├── signal_scores.json
-│   ├── relationship_map.json
-│   └── latent_hypotheses.json
 ├── outputs/
-│   ├── role_interfaces.md
-│   ├── info_flows.md
-│   ├── org_diagnosis.md
-│   └── SKILL.md
 └── versions/
 ```
 
-上面这套结构的意义不只是“放整齐”，而是把每一层产物都显式分开：原材料、标准化结果、中间分析产物、最终输出，彼此不要混写。这样后面无论人工检查、模型回溯还是别的开发者接手，都知道每一层究竟在干什么。
+你也可以直接执行下面这组命令：
 
-## 你需要如何放置文件
+```bash
+mkdir -p organizations/demo-team/{evidence/docs,evidence/messages,evidence/meetings,evidence/decisions,evidence/snapshots,normalized,derived,outputs,versions}
+```
 
-按照当前分工，你只需要负责把材料放进约定目录，不需要再处理代码实现细节。为了让现有脚本后续能稳定工作，建议你按下表整理。
+### 2. 写一个最小 `meta.json`
 
-| 材料类型 | 建议放置目录 | 说明 |
-|---|---|---|
-| 项目文档、评审文档、排障记录 | `evidence/docs/` | 优先高信息材料，文件名尽量语义化 |
-| 群聊导出、IM 文本记录 | `evidence/messages/` | 保留时间、说话人和会话信息 |
-| 会议纪要、录音转写 | `evidence/meetings/` | 尽量保留主持人、参与者和议题 |
-| 明确的决策记录、任务分派、周报 | `evidence/decisions/` | 这是高价值材料，优先补齐 |
-| 截图、白板、流程图等快照 | `evidence/snapshots/` | 如果后续要做 OCR/多模态，可在这里扩展 |
+```json
+{
+  "name": "Demo Team",
+  "slug": "demo-team",
+  "scope": "一个跨职能项目组",
+  "user_role": "项目协调 / 运营接口",
+  "core_problem": "决策路径不清，推进责任反复漂移",
+  "stay_leave_question": "这是不是一个还能修的系统",
+  "suspected_pattern": "信息不透明、多人协调但单点拍板缺失",
+  "interaction_targets": ["老板", "产品经理", "技术负责人"],
+  "available_sources": ["群聊", "会议纪要", "决策记录"]
+}
+```
 
-如果你只能先提供一部分样本，建议优先补三类：**决策记录、排障/评审文档、连续群聊片段**。因为这三类最容易暴露真实接口、owner 分布和上下文损耗点。
+### 3. 把材料原样丢进 `evidence/`
 
-## 当前核心脚本与典型产物
+这一步最重要的原则是：**不要为了“看起来专业”而过度预处理。** 当前版本设计的前提，就是尽量接住现实里本来就粗糙的工作痕迹。[2]
 
-为了避免后续接力开发时不知道每个脚本应该吐出什么，当前仓库默认采用下面这条产物链。
+| 你手头有什么 | 放到哪里 | 备注 |
+| --- | --- | --- |
+| 一段用户自述 | `evidence/docs/` | 可以是口语化 Markdown / txt |
+| 连续群聊导出 | `evidence/messages/` | txt / md / csv 都可尝试 |
+| 会议纪要或转写 | `evidence/meetings/` | 不要求统一模板 |
+| 任务分派、待办流、OKR | `evidence/decisions/` | 粗糙文本也可以 |
+| 截图、流程图、表格快照 | `evidence/snapshots/` | 作为补充上下文 |
 
-| 阶段 | 输入 | 脚本 | 输出 |
-|---|---|---|---|
-| 证据标准化 | `organizations/{slug}/evidence/` | `tools/evidence_normalizer.py` | `normalized/evidence_units.json` |
-| 线程重建 | `normalized/evidence_units.json` | `tools/thread_reconstructor.py` | `derived/thread_map.json` |
-| 去噪与评分 | `thread_map.json` / `evidence_units.json` | `tools/noise_filter.py` | `derived/signal_scores.json` |
-| 关系映射 | `thread_map.json` / `signal_scores.json` | `tools/relationship_mapper.py` | `derived/relationship_map.json` |
-| 隐性结构推断 | `thread_map.json` / `relationship_map.json` / `signal_scores.json` | `tools/latent_structure_inferer.py` | `derived/latent_hypotheses.json` |
-| 结果写入 | 上述中间产物 + 分析文本 | `tools/org_skill_writer.py` | `outputs/*.md` 与组织 skill |
+### 4. 运行最小分析链路
 
-这条链条的重点是：**任何最终判断都应该能回溯到中间产物和原始证据**。如果不能回溯，就说明分析仍然过于玄学。
+下面这组命令对应当前仓库里最稳定、最值得公开展示的最小闭环：
 
-## 当前输出结构
+```bash
+python3 tools/evidence_indexer.py \
+  --org-dir organizations/demo-team
 
-最终的组织分析结果应主要落在 `outputs/` 中，并至少包括以下文件。
+python3 tools/evidence_normalizer.py \
+  --org-dir organizations/demo-team \
+  --output normalized/evidence_units.json
 
-| 文件 | 作用 |
-|---|---|
-| `role_interfaces.md` | 解释哪些角色掌握什么层级的信息，以及他们向上、向下、向平级输出什么 |
-| `info_flows.md` | 解释信息如何流动、在哪些接口被压缩、误传、损耗或重新翻译 |
-| `org_diagnosis.md` | 解释组织症状、权限边界、决策集中度、owner 缺口与高协同成本 |
-| `SKILL.md` | 汇总后的组织分析 skill |
+python3 tools/thread_reconstructor.py \
+  --input organizations/demo-team/normalized/evidence_units.json \
+  --output organizations/demo-team/derived/thread_map.json
 
-其中，V2 特别强调一点：`org_diagnosis.md` 不能只是“看起来像管理有问题”的抒情总结，而必须尽可能引用线程、关系边和假设清单来支撑。
+python3 tools/noise_filter.py \
+  --evidence-input organizations/demo-team/normalized/evidence_units.json \
+  --thread-input organizations/demo-team/derived/thread_map.json \
+  --output organizations/demo-team/derived/signal_scores.json
 
-## 推荐开发顺序
+python3 tools/relationship_mapper.py \
+  --threads organizations/demo-team/derived/thread_map.json \
+  --scores organizations/demo-team/derived/signal_scores.json \
+  --output organizations/demo-team/derived/relationship_map.json
 
-既然当前分工已经明确，后续最合理的推进方式不是让你来补代码，而是由我继续把实现和文档收口，你只负责维护材料输入的稳定性。建议顺序如下。
+python3 tools/latent_structure_inferer.py \
+  --thread-input organizations/demo-team/derived/thread_map.json \
+  --relation-input organizations/demo-team/derived/relationship_map.json \
+  --score-input organizations/demo-team/derived/signal_scores.json \
+  --output organizations/demo-team/derived/latent_hypotheses.json
+```
 
-| 顺序 | 任务 | 负责人 |
-|---|---|---|
-| 1 | 继续加固 V2 中间层脚本、字段和接口契约 | 我 |
-| 2 | 补齐提示词协议，让模型分析与中间产物格式对齐 | 我 |
-| 3 | 更新 README、ARCHITECTURE、实施计划和工程规范 | 我 |
-| 4 | 按目录约定放入真实样本包 | 你 |
-| 5 | 基于真实样本跑第一轮闭环并修正字段与规则 | 我主导，你配合提供材料 |
-| 6 | 再决定是否接入自动采集器和更复杂的报告生成 | 共同决策 |
+### 5. 你会得到什么
 
-## 开发与协作原则
+最小闭环跑完后，当前版本至少应该生成下面几类产物：
 
-这个项目如果想真正可用，最怕的不是“代码写得慢”，而是边写边改口径，最后目录、字段、文档和 Prompt 各说各话。因此，当前默认遵守以下原则。
+| 文件 | 含义 | 适合拿来做什么 |
+| --- | --- | --- |
+| `normalized/evidence_units.json` | 标准化后的证据单元 | 检查原始材料是否被正确吸收 |
+| `derived/thread_map.json` | 重建后的上下文线程 | 看讨论链有没有被串起来 |
+| `derived/signal_scores.json` | 信号评分结果 | 过滤闲聊和低价值噪音 |
+| `derived/relationship_map.json` | 关系边集合 | 看谁在请求、汇报、拍板、协调、卡住 |
+| `derived/latent_hypotheses.json` | 保守的结构假设 | 形成第一版组织判断 |
 
-| 原则 | 含义 |
-|---|---|
-| 先证据、后判断 | 不允许跳过证据分层直接下组织结论 |
-| 先线程、后诊断 | 不理解对话关系，就不要急着解释组织结构 |
-| 先去噪、后放大 | 闲聊、寒暄、低信号互动不得直接放大为组织症状 |
-| 先保守推断、后升级置信度 | 隐性结构只能做假设，不能伪装成已证实事实 |
-| 一层一输出 | 原材料、标准化产物、中间分析产物和最终报告必须分层存放 |
-| 文档跟着代码走 | 字段、目录和命令一旦改动，README 与架构文档必须同步更新 |
+### 6. 如果你想写回成 Skill 文件
 
-## 下一步最需要什么
+当前仓库还提供了一个 Skill 写入器，用于把结构化结论写回可复用文件：
 
-当前最关键的，不是再写更多“组织洞察”，而是尽快拿一份真实样本把中间层跑通。只有真实样本能暴露哪些字段不够、哪些规则太粗、哪些 Prompt 仍然把闲聊误判为信号。
+```bash
+python3 tools/org_skill_writer.py \
+  --action create \
+  --slug demo-team \
+  --name "Demo Team" \
+  --meta organizations/demo-team/meta.json \
+  --reality path/to/my_structural_reality.md \
+  --energy path/to/my_energy_drain.md \
+  --decision path/to/stay_or_leave_decision.md \
+  --base-dir ./organizations
+```
 
-因此，如果你要继续配合我推进，最有价值的动作不是解释更多抽象想法，而是按照目录规范放入一批**连续、可追溯、能看出角色关系的真实材料**。我会继续把代码、接口和文档补齐到可以稳定接力的状态。
+这一步适合在你已经有了比较稳定的解释层文稿之后再执行。换句话说，**当前公开版本最成熟的是分析骨架，不是全自动文稿生成器**。
 
-## References
+## 六、标准输出契约示例
 
-[1]: https://github.com/titanwings/colleague-skill "titanwings/colleague-skill"
+为了让其他 Agent、脚本或上层产品更容易接入，当前版本建议至少把下面两层契约讲清楚：一个是 **intake 契约**，一个是 **中间产物契约**。
+
+### 1. Intake 契约
+
+这部分与 `SKILL.md` 保持一致，建议任何上层 Agent 在正式分析前，先收敛到这份最小 JSON。[1]
+
+```json
+{
+  "name": "...",
+  "scope": "...",
+  "user_role": "...",
+  "core_problem": "...",
+  "stay_leave_question": "...",
+  "suspected_pattern": "...",
+  "interaction_targets": ["...", "..."],
+  "available_sources": ["...", "..."]
+}
+```
+
+### 2. 中间产物契约
+
+| 文件 | 最小字段关注点 | 用途 |
+| --- | --- | --- |
+| `evidence_units.json` | `count`、`items[].unit_id`、`items[].source_type`、`items[].primary_speaker` | 确认吸收质量 |
+| `thread_map.json` | 线程 ID、参与人、摘要、证据关联 | 确认上下文重建 |
+| `signal_scores.json` | `unit_id`、总分、解释因子 | 识别高信号内容 |
+| `relationship_map.json` | `source`、`target`、`relation_type`、`evidence_ids` | 识别协作结构 |
+| `latent_hypotheses.json` | 假设类型、描述、支撑证据 | 形成保守推断 |
+
+如果要支持二次开发，最推荐的做法不是直接解析自然语言结论，而是**优先消费这五类 JSON 产物**，再由上层 Agent 决定如何生成报告、画像或建议。
+
+## 七、别的 Agent 能不能直接用
+
+可以，但要说得更准确一点：**这是一个“可被别的 Agent 复用的 Skill 骨架”，不是一个对所有 Agent 平台零改造通吃的万能插件。**
+
+它最适合下面这类 Agent 运行环境：能够读取 `SKILL.md`，能够按说明组织目录，能够执行命令行脚本，能够读写 JSON 和 Markdown，并且允许在分析后继续调用自己的语言能力去完成解释层收束。
+
+| Agent 类型 | 直接复用程度 | 说明 |
+| --- | --- | --- |
+| 具备文件系统与命令执行能力的通用 Agent | 高 | 最适合直接接入当前版本 |
+| 支持工具调用的工作流 Agent | 中 | 需要把每个脚本封成节点 |
+| 只能纯对话、不能跑脚本的 Agent | 低 | 只能复用方法论，难以直接复用工程链路 |
+| 想做 SaaS 化前台的 Agent / App | 中 | 建议把中间产物层当后端能力，对前端另外封装 |
+
+### 外部 Agent 适配时要补的最小解释
+
+如果你希望外部 Agent 生态更顺滑地接入，建议在 README 里明确下面三件事：
+
+1. **触发条件**：什么情况下应该调用这个 Skill，例如“用户在描述团队混乱、权责不清、反复背锅、想判断留熬逃时触发”。
+2. **输入边界**：这个 Skill 接受粗糙材料，但仍然需要至少构成一个局部工作场景，而不是几句纯情绪吐槽。
+3. **输出边界**：输出的是保守的组织假设与策略建议，不是法律、HR 或心理诊断结论。
+
+## 八、如果现在就发布这个版本，必须带上的解释
+
+这是当前最关键的一节。因为这个项目**已经值得发**，但如果不把解释带齐，很容易被外界误读成“读几段聊天就给公司算命”。当前版本对外发布时，建议务必同时附带下面这些说明。
+
+| 必带解释 | 为什么一定要带 |
+| --- | --- |
+| 这是 **v0.x 原型**，不是产品终版 | 避免别人用产品预期要求当前仓库 |
+| 输出是 **组织假设**，不是最终裁决 | 防止把推断当事实判决 |
+| 当前最成熟的是 **分析骨架**，不是一键报告生成 | 避免误解自动化程度 |
+| 仓库不附真实敏感样本，使用者需自行脱敏 | 保护隐私，也避免别人以为缺样本就不可用 |
+| 最低门槛是“能构成局部工作场景的一组材料” | 防止拿极少上下文硬跑出过度结论 |
+| 跨 Agent 可复用，但前提是 Agent 支持文件、命令、JSON | 防止“为什么我在纯聊天机器人里跑不起来” |
+| 结果适合做研究、复盘和策略讨论，不适合做纪律处罚依据 | 划清伦理与使用边界 |
+
+### 一个可以直接放在发布页里的版本说明
+
+> 本项目当前公开版本为 **组织蒸馏 Skill 的可运行原型**。它已经可以把群聊、会议纪要、任务分派、用户自述等真实工作痕迹转成结构化中间产物，并据此形成保守的组织诊断假设。我们建议把它理解为一套“组织侦察骨架”，而不是一键生成最终真相的产品。输出结论应被用于复盘、研究、协作策略讨论和 Agent 工作流搭建，而不应被直接视为 HR、法律或纪律处置依据。
+
+## 九、这次发布最好还一起带什么
+
+如果你要把当前版本正式对外发布，除了 README 本身，建议至少同步附上下面几类说明，外部理解成本会低很多。[3][4]
+
+| 优先级 | 建议一起发布的内容 | 作用 |
+| --- | --- | --- |
+| P0 | 一份真正可复制的 Quickstart | 让第一次试跑的人知道怎么从零开始 |
+| P0 | 更收紧的 `SKILL.md` 触发条件与元信息 | 提升跨 Agent 识别稳定性 |
+| P0 | 一份脱敏样例目录或脱敏样例截图 | 降低“没有数据就看不懂”的门槛 |
+| P1 | 一份外部 Agent 适配说明 | 说明什么平台可直接用，什么平台需改造 |
+| P1 | 一份标准输出契约样例 | 方便别人基于 JSON 二次开发报告层 |
+
+如果只能先补一件事，我最建议优先补 **Quickstart + 脱敏样例说明**。因为一个开源项目是否“看起来真的能用”，常常不取决于理念多漂亮，而取决于别人能不能在十分钟内完成第一次成功试跑。
+
+## 十、已知限制
+
+当前版本的局限并不可怕，可怕的是不写清楚。下面这些限制，建议你在公开发布时明确写出来。[3][4]
+
+| 限制 | 当前状态 |
+| --- | --- |
+| 真实样本依赖较强 | 已验证真实群聊场景有效，但公共脱敏样例仍建议继续补 |
+| 解释层口径还可继续收束 | 中间产物比较稳定，最终话术仍可继续打磨 |
+| 平台无关性尚未完全验证 | 已适合具备命令执行能力的 Agent，其他平台仍需适配 |
+| 一键入口尚不完整 | 当前更像工程原型，不是最终产品界面 |
+| 输出不是事实判决 | 仍需结合人类判断、上下文和更多证据交叉验证 |
+
+## 十一、推荐的发布口径
+
+如果你想把这个项目讲得更有意思、也更准确，我建议对外这样介绍它：
+
+> 大家都在做“同事 Skill”“老板 Skill”“办公室人格分析器”，但我们更想做一件反过来的事：不是分析一个人，而是反向蒸馏一个组织。我们想知道的，不是谁天生难搞，而是谁在掌握上下文，谁在转述失真，谁在承担缓冲，谁看起来像 owner、其实并没有拍板权。这个项目就是把群聊、会议、任务分派和用户自述这些日常工作痕迹，重新翻译成可供 Agent 使用的组织分析骨架。
+
+## 参考文档
+
+[1]: ./SKILL.md
+[2]: ./docs/FIRST_EXPERIMENT_RUNBOOK.md
+[3]: ./docs/OPEN_SOURCE_RELEASE_PLAN.md
+[4]: ./docs/NEXT_STEPS_AND_USER_ACTIONS.md
