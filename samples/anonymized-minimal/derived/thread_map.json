@@ -1,0 +1,144 @@
+{
+  "generated_at": "2026-04-11T10:36:29.116190+00:00",
+  "count": 3,
+  "items": [
+    {
+      "thread_id": "thread-001-任务分派记录脱敏样例",
+      "topic": "任务分派记录（脱敏样例）",
+      "participants": [],
+      "probable_owner": null,
+      "start_signal": "决策材料：evidence/decisions/task_split.md",
+      "resolution_state": "unknown",
+      "org_signal_candidates": [
+        "contains_decision_record",
+        "high_context_material"
+      ],
+      "evidence_refs": [
+        "decision:evidence/decisions/task_split_md"
+      ],
+      "turns": [
+        {
+          "speaker": "unknown",
+          "addressed_to": [],
+          "reply_to_speaker": null,
+          "action_hint": "需要进一步推断具体动作",
+          "turn_type": "unknown",
+          "content": "# 任务分派记录（脱敏样例）\n## 本周试点拆分\n| 事项 | 表面责任人 | 实际依赖 | 当前状态 |",
+          "timestamp": "2026-04-11T10:31:50.996739+00:00",
+          "evidence_refs": [
+            "decision:evidence/decisions/task_split_md"
+          ],
+          "metadata": {
+            "source_type": "decision",
+            "conversation_id": "decisions"
+          }
+        }
+      ],
+      "missing_context": [
+        "参与角色暴露不足，无法稳定恢复互动关系",
+        "缺少明确时间戳，线程顺序只能依赖文件修改时间"
+      ],
+      "metadata": {
+        "generated_at": "2026-04-11T10:36:29.116049+00:00",
+        "heuristic": "conversation_topic_time_grouping",
+        "item_count": 1,
+        "conversation_id": "decisions"
+      }
+    },
+    {
+      "thread_id": "thread-002-messages",
+      "topic": "messages",
+      "participants": [],
+      "probable_owner": null,
+      "start_signal": "聊天材料：evidence/messages/group_chat_excerpt.csv",
+      "resolution_state": "escalated",
+      "org_signal_candidates": [
+        "contains_chat_thread"
+      ],
+      "evidence_refs": [
+        "message:evidence/messages/group_chat_excerpt_csv"
+      ],
+      "turns": [
+        {
+          "speaker": "unknown",
+          "addressed_to": [],
+          "reply_to_speaker": null,
+          "action_hint": "出现升级或跨层协调动作",
+          "turn_type": "escalation",
+          "content": "日期,时间,发送者,内容\n2026-03-11,09:12,项目负责人A,这周要把试点方案定下来，先别展开太多分支。\n2026-03-11,09:18,产品接口B,我先把需求背景补一下，不过具体优先级还是要看研发排期。",
+          "timestamp": "2026-03-11",
+          "evidence_refs": [
+            "message:evidence/messages/group_chat_excerpt_csv"
+          ],
+          "metadata": {
+            "source_type": "message",
+            "conversation_id": "group_chat_excerpt.csv"
+          }
+        }
+      ],
+      "missing_context": [
+        "参与角色暴露不足，无法稳定恢复互动关系",
+        "缺少决策类材料，无法确认线程是否被真正拍板"
+      ],
+      "metadata": {
+        "generated_at": "2026-04-11T10:36:29.116143+00:00",
+        "heuristic": "conversation_topic_time_grouping",
+        "item_count": 1,
+        "conversation_id": "group_chat_excerpt.csv"
+      }
+    },
+    {
+      "thread_id": "thread-003-周会纪要脱敏样例",
+      "topic": "周会纪要（脱敏样例）",
+      "participants": [
+        "- 参与人：项目负责人A",
+        "产品接口B",
+        "我",
+        "研发负责人C"
+      ],
+      "probable_owner": null,
+      "start_signal": "会议材料：evidence/meetings/weekly_sync.md",
+      "resolution_state": "escalated",
+      "org_signal_candidates": [
+        "contains_meeting_alignment",
+        "high_context_material"
+      ],
+      "evidence_refs": [
+        "meeting:evidence/meetings/weekly_sync_md"
+      ],
+      "turns": [
+        {
+          "speaker": "unknown",
+          "addressed_to": [
+            "- 参与人：项目负责人A",
+            "产品接口B",
+            "我",
+            "研发负责人C"
+          ],
+          "reply_to_speaker": null,
+          "action_hint": "出现升级或跨层协调动作",
+          "turn_type": "escalation",
+          "content": "# 周会纪要（脱敏样例）\n- 时间：周三例会\n- 参与人：项目负责人A、产品接口B、研发负责人C、我",
+          "timestamp": "2026-04-11T10:31:42.440719+00:00",
+          "evidence_refs": [
+            "meeting:evidence/meetings/weekly_sync_md"
+          ],
+          "metadata": {
+            "source_type": "meeting",
+            "conversation_id": "meetings"
+          }
+        }
+      ],
+      "missing_context": [
+        "缺少明确时间戳，线程顺序只能依赖文件修改时间",
+        "缺少决策类材料，无法确认线程是否被真正拍板"
+      ],
+      "metadata": {
+        "generated_at": "2026-04-11T10:36:29.116181+00:00",
+        "heuristic": "conversation_topic_time_grouping",
+        "item_count": 1,
+        "conversation_id": "meetings"
+      }
+    }
+  ]
+}

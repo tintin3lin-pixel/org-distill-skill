@@ -1,0 +1,28 @@
+{
+  "name": "Anonymized Demo Org",
+  "slug": "anonymized-minimal",
+  "scope": "一个跨职能项目小组",
+  "user_role": "项目推进接口 / 运营协调",
+  "core_problem": "任务在推进，但真实拍板点不稳定，责任在多人之间来回漂移",
+  "stay_leave_question": "这是不是一个还能修的系统，还是应该尽快准备离场",
+  "suspected_pattern": "信息碎片化、推进依赖单一协调者、关键 owner 缺失",
+  "interaction_targets": [
+    "项目负责人A",
+    "产品接口B",
+    "研发负责人C"
+  ],
+  "available_sources": [
+    "用户自述",
+    "群聊节选",
+    "会议纪要",
+    "任务分派记录"
+  ],
+  "source_stats": {
+    "docs": 1,
+    "messages": 1,
+    "meetings": 1,
+    "decisions": 1,
+    "snapshots": 0
+  },
+  "updated_at": "2026-04-11T10:36:28.993146+00:00"
+}

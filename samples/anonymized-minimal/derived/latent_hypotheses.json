@@ -1,0 +1,24 @@
+{
+  "generated_at": "2026-04-11T10:36:29.304823+00:00",
+  "count": 1,
+  "items": [
+    {
+      "hypothesis_id": "hyp_insufficient_material",
+      "variable": "insufficient_material",
+      "observation": "当前材料尚不足以稳定推断隐性组织结构。",
+      "confidence": "needs_validation",
+      "evidence_refs": [],
+      "reasoning": "现有线程、关系和信号评分可以支撑基础梳理，但仍不足以稳定反推出组织深层接口。",
+      "counter_evidence": [],
+      "missing_evidence_needed": [
+        "更多决策记录",
+        "更完整线程上下文",
+        "会议纪要",
+        "任务分派与复盘材料"
+      ],
+      "validation_questions": [
+        "是否有更接近拍板、分工、排障和复盘的材料可补充？"
+      ]
+    }
+  ]
+}

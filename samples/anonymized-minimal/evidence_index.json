@@ -1,0 +1,51 @@
+{
+  "organization_dir": "/home/ubuntu/pmf-org-distill-skill/samples/anonymized-minimal",
+  "generated_at": "2026-04-11T10:36:28.992395+00:00",
+  "source_stats": {
+    "docs": 1,
+    "messages": 1,
+    "meetings": 1,
+    "decisions": 1,
+    "snapshots": 0
+  },
+  "sources": {
+    "docs": [
+      {
+        "path": "evidence/docs/user_statement.md",
+        "name": "user_statement.md",
+        "suffix": ".md",
+        "size_bytes": 1093,
+        "modified_at": "2026-04-11T10:30:23.784638+00:00"
+      }
+    ],
+    "messages": [
+      {
+        "path": "evidence/messages/group_chat_excerpt.csv",
+        "name": "group_chat_excerpt.csv",
+        "suffix": ".csv",
+        "size_bytes": 923,
+        "modified_at": "2026-04-11T10:31:28.172705+00:00"
+      }
+    ],
+    "meetings": [
+      {
+        "path": "evidence/meetings/weekly_sync.md",
+        "name": "weekly_sync.md",
+        "suffix": ".md",
+        "size_bytes": 1226,
+        "modified_at": "2026-04-11T10:31:42.440719+00:00"
+      }
+    ],
+    "decisions": [
+      {
+        "path": "evidence/decisions/task_split.md",
+        "name": "task_split.md",
+        "suffix": ".md",
+        "size_bytes": 1014,
+        "modified_at": "2026-04-11T10:31:50.996739+00:00"
+      }
+    ],
+    "snapshots": []
+  },
+  "total_files": 4
+}
