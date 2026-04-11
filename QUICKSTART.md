@@ -1,4 +1,4 @@
-# QUICKSTART
+# 快速开始
 
 `pmf-org-distill-skill` 当前最值得公开展示的，不是“一键看透组织”的幻觉，而是一条**从粗糙材料到保守结构假设**的最小可运行链路。这个文档的目标，就是让第一次接触项目的人在 **5 分钟内看懂目录协议，在 10 分钟内完成第一次试跑**。[1] [2]
 
@@ -154,6 +154,6 @@ python3 tools/org_skill_writer.py \
 
 [1]: ./README.md "pmf-org-distill-skill README"
 [2]: ./samples/README.md "Anonymized Sample Guide"
-[3]: ./docs/OPEN_SOURCE_RELEASE_PLAN.md "Open Source Release Plan"
-[4]: ./docs/CHAT_CSV_COMPATIBILITY_VALIDATION.md "Chat CSV Compatibility Validation"
-[5]: ./docs/KNOWN_LIMITS_AND_MISREADINGS.md "Known Limits and Misreadings"
+[3]: ./docs/KNOWN_LIMITS_AND_MISREADINGS.md "已知局限与常见误读"
+[4]: ./docs/CHAT_CSV_COMPATIBILITY_VALIDATION.md "Chat CSV 兼容性验证说明"
+[5]: ./docs/EXTERNAL_AGENT_ADAPTATION.md "外部 Agent 适配说明"

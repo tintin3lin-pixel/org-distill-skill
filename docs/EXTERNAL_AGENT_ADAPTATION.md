@@ -1,4 +1,4 @@
-# External Agent Adaptation
+# 外部 Agent 适配说明
 
 本文档回答一个很现实的问题：**别的 Agent 能不能直接用 `pmf-org-distill-skill`？** 答案是能，但前提不是“模型足够聪明”，而是运行环境至少具备几项基础能力。[1] [2]
 
@@ -76,9 +76,9 @@
 
 > 这是一个组织诊断骨架，而不是最终裁决器。它最擅长把群聊、会议、任务记录、自述等材料转成结构化中间产物，并据此形成保守的组织假设。最终解释层仍建议结合更多上下文与人工判断完成。
 
-## References
+## 参考文档
 
 [1]: ../SKILL.md "pmf-org-distill-skill SKILL"
 [2]: ../README.md "pmf-org-distill-skill README"
-[3]: ../QUICKSTART.md "Quickstart"
-[4]: ./KNOWN_LIMITS_AND_MISREADINGS.md "Known Limits and Misreadings"
+[3]: ../QUICKSTART.md "快速开始"
+[4]: ./KNOWN_LIMITS_AND_MISREADINGS.md "已知限制与常见误读"

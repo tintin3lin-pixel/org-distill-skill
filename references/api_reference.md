@@ -1,34 +1,88 @@
-# Reference Documentation for Create Organization
+# 接口与产物字段参考
 
-This is a placeholder for detailed reference documentation.
-Replace with actual reference content or delete if not needed.
+这份文档面向准备二次开发、接入工作流，或让其他 Agent 调用 **org-distill-skill** 的开发者。它不试图把仓库里所有实现细节都铺开，而是优先回答三个更实际的问题：**输入应该怎么放、主链路会产出什么、外部系统该如何消费这些结果。**
 
-Example real reference docs from other skills:
-- product-management/references/communication.md - Comprehensive guide for status updates
-- product-management/references/context_building.md - Deep-dive on gathering context
-- bigquery/references/ - API references and query examples
+## 一、这份参考文档是给谁看的
 
-## When Reference Docs Are Useful
+如果你只是第一次试跑项目，优先阅读 `README.md` 和 `QUICKSTART.md` 会更直接。如果你已经准备把这个仓库接入自己的 Agent、自动化流程或前端界面，那么这份文档会更有用，因为它聚焦的是**目录协议、关键中间产物和最终输出边界**。
 
-Reference docs are ideal for:
-- Comprehensive API documentation
-- Detailed workflow guides
-- Complex multi-step processes
-- Information too lengthy for main SKILL.md
-- Content that's only needed for specific use cases
+| 读者角色 | 最关心的问题 | 建议先读什么 |
+| --- | --- | --- |
+| 首次试跑者 | 怎么快速跑起来 | `README.md`、`QUICKSTART.md` |
+| Skill 接入者 | 触发条件、输入协议、输出边界 | `SKILL.md`、本文档 |
+| 二次开发者 | 哪些文件稳定、哪些只是中间产物 | 本文档、`docs/STANDARD_OUTPUT_CONTRACT_EXAMPLE.md` |
+| 结果消费方 | 最终应该读取哪个输出文件 | 本文档第四节 |
 
-## Structure Suggestions
+## 二、最小输入目录协议
 
-### API Reference Example
-- Overview
-- Authentication
-- Endpoints with examples
-- Error codes
-- Rate limits
+当前仓库采用“目录即协议”的方式组织输入。也就是说，外部调用方不一定要通过某个在线 API 提交数据，只要按约定把材料放进指定目录，就能进入主链路。
 
-### Workflow Guide Example
-- Prerequisites
-- Step-by-step instructions
-- Common patterns
-- Troubleshooting
-- Best practices
+```text
+organizations/<org_slug>/
+├── meta.json
+├── evidence/
+│   ├── docs/
+│   ├── messages/
+│   ├── meetings/
+│   ├── decisions/
+│   └── snapshots/
+├── normalized/
+├── derived/
+└── outputs/
+```
+
+其中最关键的是 `meta.json` 和 `evidence/`。前者用于描述组织样本的基础信息，后者用于承载待分析材料。
+
+| 路径 | 用途 | 是否必需 | 说明 |
+| --- | --- | --- | --- |
+| `meta.json` | 样本元信息 | 是 | 建议至少包含 `org_slug`、`language`、`notes` 等基础字段 |
+| `evidence/docs/` | 用户自述、项目文档、复盘、SOP | 否 | 适合承接背景与上下文材料 |
+| `evidence/messages/` | 群聊、聊天导出、消息摘录 | 否 | 适合识别推进链路、升级路径与上下文失真 |
+| `evidence/meetings/` | 会议纪要、转写、同步记录 | 否 | 适合观察共识形成和角色分工 |
+| `evidence/decisions/` | 决策记录、任务分派、待办流转 | 否 | 适合判断谁拍板、谁负责、谁承担缓冲 |
+| `evidence/snapshots/` | 截图、流程图、表格快照 | 否 | 适合作为补充证据或交叉验证材料 |
+
+> 最低可运行门槛并不高。通常一份用户自述，加上一份群聊、会议或决策记录中的任意一种，就足以启动第一轮分析。
+
+## 三、主链路会生成什么
+
+这个项目不是直接从原始材料跳到一句结论，而是先形成可回溯的中间层，再生成最终输出。对于接入方来说，理解这些产物的职责非常重要。
+
+| 层级 | 典型目录 | 作用 | 是否建议外部直接消费 |
+| --- | --- | --- | --- |
+| 原始输入层 | `evidence/` | 存放尚未统一格式的材料 | 否，主要用于留档与追溯 |
+| 标准化层 | `normalized/` | 把不同材料统一成可分析单元 | 一般不直接给终端用户 |
+| 推导层 | `derived/` | 构建线程、关系、假设与结构信号 | 适合调试、审查和二次开发 |
+| 输出层 | `outputs/` | 产出面向用户或外部系统的最终结果 | 是，优先消费这一层 |
+
+如果你的系统只想拿到“可展示结果”，建议优先读取 `outputs/`。如果你要做审计、可解释性展示或更复杂的流程编排，再进一步读取 `normalized/` 与 `derived/`。
+
+## 四、推荐优先消费的输出文件
+
+公开版本里，外部系统不应该假设所有中间文件都长期稳定；但可以优先围绕少数关键产物做接入。
+
+| 文件 | 建议用途 | 适合谁读取 |
+| --- | --- | --- |
+| `outputs/analysis_report.md` | 严谨版分析结果 | 研究者、开发者、审查者 |
+| `outputs/readable_brief.md` | 面向普通用户的易读摘要 | 前端界面、终端用户 |
+| `outputs/stay_leave_assessment.json` | 结构化去留判断 | 自动化系统、策略分支 |
+| `outputs/evidence_trace.json` | 关键判断到证据的映射 | 调试、解释性界面、质检流程 |
+
+如果你只能接一个输出文件，建议优先从 `readable_brief.md` 开始；如果你要做程序化消费，建议同时读取 `stay_leave_assessment.json` 与 `evidence_trace.json`。
+
+## 五、接入时要遵守的边界
+
+这类项目最容易被误用的地方，不在工程，而在解释。**org-distill-skill** 给出的不是人事裁决，也不是对个体性格的绝对判断，而是对组织结构、信息接口和角色位置的保守推断。
+
+| 边界 | 正确理解 | 不正确理解 |
+| --- | --- | --- |
+| 结果性质 | 基于材料的组织诊断 | 对个人能力或人格下最终定义 |
+| 去留建议 | 基于证据的行动倾向 | 替用户做人生决定 |
+| 输出可信度 | 与样本质量和覆盖范围相关 | 任何情况下都绝对准确 |
+| 公开样例 | 合成脱敏样例 | 真实组织的匿名改名版 |
+
+## 六、如果你要做二次开发
+
+如果你准备 fork 这个项目继续改，建议优先保持三件事稳定。第一，目录协议不要轻易改散，因为它直接关系到 Skill 的可迁移性。第二，最终输出层的文件职责要保持清楚，避免前端和自动化流程无所适从。第三，所有更锋利的表达都应该建立在可回指证据的分析层之上，而不是直接把情绪语言写进底层判断。
+
+更完整的输出结构示例，请继续阅读 `docs/STANDARD_OUTPUT_CONTRACT_EXAMPLE.md`。如果你要把它接入其他 Agent，再继续阅读 `docs/EXTERNAL_AGENT_ADAPTATION.md`。

@@ -1,4 +1,4 @@
-# Anonymized Sample Guide
+# 脱敏样例说明
 
 `samples/` 目录的作用，不是替代真实世界的复杂材料，而是给第一次接触 `org-distill-skill` 的人一个**看得见、能照抄、不会泄露隐私**的起点。[1]
 
@@ -50,5 +50,5 @@
 
 [1]: ../README.md "pmf-org-distill-skill README"
 [2]: ../QUICKSTART.md "Quickstart"
-[3]: ../docs/OPEN_SOURCE_RELEASE_PLAN.md "Open Source Release Plan"
-[4]: ../docs/KNOWN_LIMITS_AND_MISREADINGS.md "Known Limits and Misreadings"
+[3]: ../docs/KNOWN_LIMITS_AND_MISREADINGS.md "已知局限与常见误读"
+[4]: ../docs/EXTERNAL_AGENT_ADAPTATION.md "外部 Agent 适配说明"

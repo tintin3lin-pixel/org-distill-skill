@@ -1,4 +1,4 @@
-# Organization Diagnosis Output Contract
+# 组织诊断输出契约
 
 本文档用于把 **pmf-org-distill-skill** 的输出层正式定义清楚：后端必须严谨，前端必须好懂。我们不是在做一份冷冰冰的组织管理报告，也不是在做一份纯情绪宣泄文本，而是在做一种**带证据约束的组织诊断表达**。
 
