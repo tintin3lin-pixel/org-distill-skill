@@ -1,6 +1,6 @@
 # Anonymized Sample Guide
 
-`samples/` 目录的作用，不是替代真实世界的复杂材料，而是给第一次接触 `pmf-org-distill-skill` 的人一个**看得见、能照抄、不会泄露隐私**的起点。[1]
+`samples/` 目录的作用，不是替代真实世界的复杂材料，而是给第一次接触 `org-distill-skill` 的人一个**看得见、能照抄、不会泄露隐私**的起点。[1]
 
 ## 一、这份样例是什么
 
