@@ -1,246 +1,197 @@
-# pmf-org-distill-skill 架构设计
+# ARCHITECTURE
 
-## 一、项目目标
+## 1. 项目目标
 
-这个项目不是再去“蒸馏一个人”，而是把原来的 colleague-skill 改写成一个**识别组织信息流、权限边界与经验沉淀方式**的 meta-skill。
+**pmf-org-distill-skill** 的目标，不是复刻某个具体的人，而是从组织运行过程中留下的材料里，识别出这个组织的**信息接口**、**权限结构**、**关系链路**与**隐性运作逻辑**。它试图回答的不是“这个人像不像老板”，而是“这个岗位到底暴露了多少信息”“这个团队到底如何做决定”“哪些人承担执行，哪些人持有上下文”。
 
-它的核心输出不再是 `work + persona` 两件套，而是围绕组织运转本身生成三类结果：
+因此，这个仓库的核心设计原则是：
 
-| 输出层 | 目标 | 对应文件 |
-|---|---|---|
-| Interface Layer | 识别不同岗位对外暴露的信息接口与行为接口 | `role_interfaces.md` |
-| Flow Layer | 识别信息如何在组织内流动、压缩、损耗、升级 | `info_flows.md` |
-| Diagnostic Layer | 归纳组织症状、权限结构、管理风险与改进建议 | `org_diagnosis.md` |
+> **蒸馏结果首先是组织接口的产物，其次才可能带有人格色彩。**
 
-最终生成的完整 Skill，不是模仿某个人说话，而是让代理在面对“这个组织怎么运转”“为什么这里的人蒸出来都很空”“哪个岗位拿不到上下文”这类问题时，能够按照材料里呈现出的组织逻辑来分析与回答。
+如果一个老板、同事或部门在蒸馏结果里显得低信息，不能直接归因为“这个人没东西”，还要继续追问：这是不是因为你拿到的材料，本身就只覆盖了他向下分发、向外协调或对外应付的那一层接口。
 
-## 二、产品定位
+## 2. V2 为什么要重构
 
-这个 Skill 本质上是一个**组织蒸馏器**。
+V1 暴露出来的核心问题，并不只是分析深度不够，而是分析链路不完整。系统直接拿表层材料做归因，很容易出现以下偏差。
 
-它服务的不是“替代某个同事”，而是帮助用户从聊天记录、文档、会议纪要、评审意见、老板指令、跨部门扯皮记录等材料里，提炼出三件事情：第一，哪些角色掌握了真正的上下文；第二，信息是如何在不同层级之间被翻译和损耗的；第三，低信息输出究竟是个人问题，还是组织接口问题。
-
-## 三、与 colleague-skill 的结构映射
-
-| colleague-skill 旧结构 | org-distill 新结构 | 改造说明 |
-|---|---|---|
-| `work.md` | `role_interfaces.md` | 从个人做事方法改为岗位对外接口、职责边界、可见信息层 |
-| `persona.md` | `org_diagnosis.md` | 从个人风格改为组织症状、管理风格、权限分布、风险判断 |
-| 合并 SKILL | `SKILL.md` | 改为组织分析代理，默认先读接口，再看流动，再做诊断 |
-| `knowledge/` | `evidence/` | 原材料按文档、消息、会议、结构化记录分类归档 |
-| `colleagues/{slug}` | `organizations/{slug}` | 每个组织或团队一个目录 |
-
-## 四、核心工作流
-
-### 1. Intake
-
-用户触发 `/create-organization` 后，不是先描述某个人，而是先描述这个组织的观察范围。最少需要四类输入：组织名或代号、分析边界、用户所处位置、已有材料来源。
-
-建议的 intake 字段如下：
-
-| 字段 | 说明 |
+| V1 问题 | 典型后果 |
 |---|---|
-| `name` | 组织、团队、业务线或项目组名称 |
-| `scope` | 本次要蒸馏的是整个公司、某个部门、某个业务单元还是项目组 |
-| `user_position` | 用户在其中的位置，如下属、平级协作方、中层管理者、核心成员 |
-| `org_hypothesis` | 用户的初始判断，例如“高层有判断但传不到一线” |
-| `sources` | 飞书、钉钉、邮件、会议纪要、评审文档、群聊截图等 |
+| 直接从群聊文本出结论 | 把片段性表达误判为稳定组织结构 |
+| 没有线程重建 | 看不到某个问题从提出到拍板的完整链条 |
+| 没有闲聊过滤 | 把寒暄、情绪释放、群内噪音误当成组织信号 |
+| 没有关系建模 | 不知道谁在请求、谁在汇报、谁在阻塞、谁在拍板 |
+| 没有隐性结构层 | 只能复述显性对话，无法推断 owner 缺口、信息损耗和权限断层 |
 
-### 2. Evidence Ingestion
+因此，V2 的核心不是简单“多写一点分析”，而是在原材料与最终报告之间新增一层**可追溯的中间分析层**。
 
-数据导入保留 colleague-skill 的自动采集思路，但分析目标改变：不再主要按“谁说过什么”拆，而是按“什么材料能证明组织怎么运转”拆。
+## 3. V2 总体架构
 
-原材料归档建议如下：
+V2 将整体流程拆成五层，每层职责明确，且必须有独立产物，不能混在一起。
+
+| 层级 | 目录/模块 | 职责 | 典型产物 |
+|---|---|---|---|
+| L0 原材料层 | `organizations/{slug}/evidence/` | 存放用户整理好的真实材料 | 原始文档、消息、会议、决策记录 |
+| L1 标准化层 | `tools/evidence_normalizer.py` | 将异构材料标准化为统一证据单元 | `normalized/evidence_units.json` |
+| L2 中间分析层 | `thread_reconstructor.py` `noise_filter.py` `relationship_mapper.py` | 重建线程、去噪评分、抽取组织关系 | `derived/thread_map.json` `signal_scores.json` `relationship_map.json` |
+| L3 推断层 | `latent_structure_inferer.py` | 基于中间产物生成可追溯组织假设 | `derived/latent_hypotheses.json` |
+| L4 输出层 | `org_skill_writer.py` + prompts | 生成组织接口、信息流和诊断文本 | `outputs/*.md` `outputs/SKILL.md` |
+
+这个架构的最大变化，是强制每一层都留下可检查的结果。这样最终结论若有问题，能够明确回查是原材料问题、标准化问题、线程问题、去噪问题，还是推断问题，而不是把所有错误都混成一句“模型理解错了”。
+
+## 4. 当前核心模块
+
+当前仓库已经落下了一套可继续加固的 V2 基础模块。
+
+| 模块 | 文件 | 职责 |
+|---|---|---|
+| 数据模型 | `tools/models.py` | 统一定义证据单元、线程、关系边、评分结果与隐性假设的数据结构 |
+| 证据索引 | `tools/evidence_indexer.py` | 扫描材料目录并生成来源统计与清单 |
+| 证据标准化 | `tools/evidence_normalizer.py` | 解析多类材料并输出统一 `EvidenceUnit` |
+| 线程重建 | `tools/thread_reconstructor.py` | 将消息证据按会话、时间和主题线索重组为线程 |
+| 去噪评分 | `tools/noise_filter.py` | 对证据和线程进行信号强度、闲聊噪音和歧义评分 |
+| 关系映射 | `tools/relationship_mapper.py` | 抽取请求、汇报、升级、拍板、阻塞等组织关系边 |
+| 隐性推断 | `tools/latent_structure_inferer.py` | 从显性材料保守生成结构性组织假设 |
+| 输出写入 | `tools/org_skill_writer.py` | 管理组织目录、输出文件和 skill 结果 |
+
+这些模块当前的目标不是“已经完全智能”，而是先把**接口契约、产物格式和接力开发边界**稳定下来。
+
+## 5. 统一数据接口
+
+V2 的关键不只是多几个脚本，而是所有脚本都围绕统一数据结构工作。`tools/models.py` 是当前的核心接口层，它应至少承担下表中的模型职责。
+
+| 模型 | 用途 | 说明 |
+|---|---|---|
+| `EvidenceUnit` | 表示标准化后的原子证据 | 应包含来源、时间、说话人/作者、文本、材料类型、上下文线索 |
+| `ConversationThread` | 表示一条可分析议题线程 | 应保留线程摘要、消息集合、主题标签和时间跨度 |
+| `SignalScore` | 表示证据或线程的信号评级 | 用于区分核心信号、辅助信号、噪音和歧义 |
+| `RelationshipEdge` | 表示组织动作关系 | 显式描述谁向谁请求、汇报、拍板、阻塞或升级 |
+| `LatentHypothesis` | 表示组织隐性结构假设 | 必须包含假设内容、置信度、证据支撑与反例线索 |
+
+统一接口的作用，在于防止后续各模块各自造字段，导致 prompt、代码、文档和输出结果之间无法对齐。
+
+## 6. 组织材料目录设计
+
+按照当前分工，**用户负责把材料放到合适的位置，我负责让代码和文档围绕这套目录工作**。因此目录设计必须稳定且可扩展。
+
+推荐的单组织目录如下。
 
 ```text
-organizations/{slug}/evidence/
-├── docs/
-├── messages/
-├── meetings/
-├── decisions/
-└── snapshots/
+organizations/{slug}/
+├── meta.json
+├── evidence/
+│   ├── docs/
+│   ├── messages/
+│   ├── meetings/
+│   ├── decisions/
+│   └── snapshots/
+├── normalized/
+│   └── evidence_units.json
+├── derived/
+│   ├── thread_map.json
+│   ├── signal_scores.json
+│   ├── relationship_map.json
+│   └── latent_hypotheses.json
+├── outputs/
+│   ├── role_interfaces.md
+│   ├── info_flows.md
+│   ├── org_diagnosis.md
+│   └── SKILL.md
+└── versions/
 ```
 
-### 3. Analysis Pipeline
+这里最重要的不是目录名字本身，而是分层原则：**原材料、标准化产物、中间分析产物、最终输出必须彼此隔离**。否则一旦某一步需要回溯，整条链就会失去可解释性。
 
-组织蒸馏的分析分三条线并行概念化，但在实现上可以先串行：
+## 7. 分析主链路
 
-#### A. Role Interface Analyzer
+V2 的分析主链路应遵守以下顺序，不能反过来。
 
-提取不同岗位的对外接口，回答：
+| 顺序 | 阶段 | 关键问题 |
+|---|---|---|
+| 1 | 证据标准化 | 材料能否被统一看待，而不是一堆格式杂乱的输入 |
+| 2 | 线程重建 | 能否看到一个议题从出现、讨论到决策的完整链条 |
+| 3 | 去噪评分 | 哪些内容是高信号，哪些只是闲聊、噪音或背景铺垫 |
+| 4 | 关系映射 | 讨论背后谁在驱动、谁在等待、谁在决策、谁在背锅 |
+| 5 | 隐性结构推断 | 组织里没有显式说出来的结构问题是什么 |
+| 6 | 报告生成 | 最终如何把以上内容写成可用的组织分析输出 |
 
-- 这个角色通常向下输出什么
-- 这个角色通常向上汇报什么
-- 这个角色掌握的是上下文、判断过程，还是已经压缩过的结论
-- 这个角色的典型行为是分发任务、协调冲突、做取舍，还是只负责传声
+这条链路体现的判断是：
 
-输出文件：`role_interfaces.md`
+> **先理解组织动作，再解释组织问题。**
 
-#### B. Information Flow Analyzer
+如果没有线程和关系层，最终诊断就只能停留在一种“看上去像”的表层判断。
 
-提取信息流路径，回答：
+## 8. Prompt 体系设计
 
-- 关键判断来自哪里
-- 在哪些层级发生了压缩
-- 哪些接口存在上下文丢失
-- 哪些岗位长期处于低信息输入/输出状态
+V2 不是单一 prompt，而是一组分工明确的协议化提示词。它们分别对应不同分析层，避免一个总 prompt 同时承担分类、推断、生成和纠错四种任务。
 
-输出文件：`info_flows.md`
-
-#### C. Organization Diagnosis Analyzer
-
-基于前两者归纳组织症状，回答：
-
-- 低信息到底更像个人问题还是结构问题
-- 组织是否存在“上层有判断，下层只收口号”的断层
-- 是否存在接口拥堵、职责模糊、过度汇报、决策黑箱等现象
-- 如果要改进，最优先补什么接口
-
-输出文件：`org_diagnosis.md`
-
-## 五、生成内容规范
-
-### 1. role_interfaces.md
-
-这个文件描述组织中关键角色分别暴露了什么信息层、承担什么接口责任。建议固定结构如下：
-
-```markdown
-# 角色接口画像
-
-## 角色一：直属老板
-### 对下输出
-### 对上输出
-### 对平级协作输出
-### 可见信息层
-### 典型接口问题
-
-## 角色二：中层负责人
-...
-```
-
-### 2. info_flows.md
-
-这个文件描述信息在组织中的来源、路径、损耗点与放大点。建议固定结构如下：
-
-```markdown
-# 信息流画像
-
-## 关键信息源
-## 主要流动路径
-## 压缩与损耗节点
-## 权限边界
-## 高信息岗位与低信息岗位
-## 典型断层案例
-```
-
-### 3. org_diagnosis.md
-
-这个文件是最终判断层。建议固定结构如下：
-
-```markdown
-# 组织诊断
-
-## 组织运转摘要
-## 主要症状
-## 权限结构判断
-## 信息分层判断
-## 管理接口判断
-## 风险列表
-## 优先级最高的改进建议
-```
-
-## 六、代码模块设计
-
-代码层保持与原项目相似的“prompt + writer + versioning + collectors”结构，但变量名和输出目标改成组织导向。
-
-```text
-pmf-org-distill-skill/
-├── SKILL.md
-├── ARCHITECTURE.md
-├── README.md
-├── TODO.md
-├── prompts/
-│   ├── intake.md
-│   ├── role_interface_analyzer.md
-│   ├── info_flow_analyzer.md
-│   ├── org_diagnosis_analyzer.md
-│   ├── interface_builder.md
-│   ├── flow_builder.md
-│   ├── diagnosis_builder.md
-│   ├── merger.md
-│   └── correction_handler.md
-├── tools/
-│   ├── org_skill_writer.py
-│   ├── version_manager.py
-│   ├── evidence_indexer.py
-│   ├── feishu_auto_collector.py
-│   ├── dingtalk_auto_collector.py
-│   └── email_parser.py
-├── organizations/
-│   └── .gitkeep
-└── references/
-    ├── org_signal_taxonomy.md
-    └── evidence_weighting.md
-```
-
-## 七、核心数据结构
-
-建议 `meta.json` 至少包含以下字段：
-
-```json
-{
-  "name": "商业化中台",
-  "slug": "biz-middle-platform",
-  "scope": "销售支持与交付协同",
-  "user_position": "平级协作方",
-  "org_hypothesis": "高层判断没有有效传导到执行层",
-  "version": "v1",
-  "created_at": "2026-04-06T00:00:00Z",
-  "updated_at": "2026-04-06T00:00:00Z",
-  "source_stats": {
-    "docs": 0,
-    "messages": 0,
-    "meetings": 0,
-    "decisions": 0
-  },
-  "diagnostic_flags": [
-    "possible_context_loss",
-    "unclear_decision_boundary"
-  ]
-}
-```
-
-## 八、命令设计
-
-| 命令 | 作用 |
+| Prompt | 作用 |
 |---|---|
-| `/create-organization` | 创建一个新的组织蒸馏项目 |
-| `/update-organization {slug}` | 追加新材料或修正已有判断 |
-| `/list-organizations` | 列出所有已生成的组织 Skill |
-| `/organization-rollback {slug} {version}` | 回滚到某个历史版本 |
+| `intake.md` | 定义输入准备与材料收集口径 |
+| `thread_reconstruction_analyzer.md` | 指导模型从消息材料中重建议题线程与上下文边界 |
+| `role_interface_analyzer.md` | 分析岗位接口、上下文拥有量和信息外露方式 |
+| `info_flow_analyzer.md` | 分析信息流向、接口损耗与中间翻译层 |
+| `org_diagnosis_analyzer.md` | 综合诊断组织结构、权限边界和风险症状 |
+| `latent_structure_inferer.md` | 保守推断显性材料背后的隐性组织结构 |
+| `interface_builder.md` `flow_builder.md` `diagnosis_builder.md` | 将中间分析结果组装成目标文档 |
+| `merger.md` | 合并多部分输出为最终组织 skill |
+| `correction_handler.md` | 处理修订与校正 |
 
-## 九、MVP 实现范围
+Prompt 的设计原则是**一层一职责**。如果一个 prompt 同时负责“理解群聊、过滤噪音、分析结构、生成结论”，最后基本一定会把低信号内容也一并解释掉。
 
-第一版先做最小可用框架，不追求把所有采集器都重写完。
+## 9. 输出结构与目标文档
 
-MVP 范围包括：
+V2 的最终输出不再是某个人的模仿版本，而是组织切片的解释器。默认包括三份核心文档和一个合并后的 skill。
 
-| 模块 | 本轮状态 |
+| 输出文件 | 目标 |
 |---|---|
-| Skill 入口 SKILL.md | 实现 |
-| prompts 骨架 | 实现 |
-| `org_skill_writer.py` | 实现 |
-| `version_manager.py` | 适配实现 |
-| `evidence_indexer.py` | 实现基础版 |
-| Feishu / DingTalk / 邮件采集器 | 先保留接口与占位说明 |
-| GitHub 仓库初始化 | 实现 |
+| `role_interfaces.md` | 解释不同角色暴露了什么接口、掌握什么上下文、承担什么责任 |
+| `info_flows.md` | 解释信息如何在组织内流动、压缩、损耗或被重新翻译 |
+| `org_diagnosis.md` | 解释组织的权限结构、协作瓶颈、决策集中度和 owner 缺口 |
+| `SKILL.md` | 将上述分析合并为一个可调用的组织 skill |
 
-## 十、实现原则
+这些输出应该尽量建立在 `derived/` 层的中间产物之上，而不是直接重述 `evidence/` 层里的原始材料。
 
-第一，保持与原项目足够相似，这样迁移成本最低。
+## 10. 角色分工与边界
 
-第二，输出重心从“模仿一个人”切换到“解释一个组织”。
+为了提高推进效率，当前默认分工如下。
 
-第三，所有生成结果都必须带上“证据意识”，也就是不要直接下人格结论，而要尽量说明这是从哪些材料、哪个岗位接口、哪条信息路径里推出来的。
+| 事项 | 负责人 |
+|---|---|
+| 代码实现 | 我 |
+| 架构设计 | 我 |
+| 接口定义 | 我 |
+| prompt 确定与更新 | 我 |
+| README 与工程文档更新 | 我 |
+| 将文件放入约定目录 | 用户 |
+| 提供真实样本和后续反馈 | 用户 |
 
-第四，先搭出稳定骨架，再逐步替换具体 prompt 与采集器。
+这种分工的好处是把“工程一致性”集中在一端维护，避免多人同时改目录、改字段、改 prompt，最后导致仓库失控。
+
+## 11. 当前最关键的工程原则
+
+这个项目若要跑通，必须长期坚持以下原则。
+
+| 原则 | 解释 |
+|---|---|
+| 先高信息材料，后泛化扩展 | 先用决策记录、评审文档、连续群聊跑通，再处理低质量输入 |
+| 先保守推断，后提高置信度 | 隐性结构是假设，不是事实替身 |
+| 先接口一致，后功能扩张 | 字段和目录不稳定时，不应盲目加更多脚本 |
+| 先中间产物可检查，后追求自动化 | 如果人看不懂中间层，自动化只会放大错误 |
+| 文档必须跟代码同步更新 | 任何字段、目录和产物变更，都要立刻更新文档 |
+
+## 12. 下一步实现重点
+
+在当前基础上，后续实现重点应集中在以下方向。
+
+| 优先级 | 任务 |
+|---|---|
+| P0 | 用真实样本验证 `EvidenceUnit`、线程和关系边字段是否够用 |
+| P0 | 跑通从 `evidence/` 到 `derived/` 的第一轮闭环 |
+| P1 | 提高去噪规则与关系识别的稳定性，减少把闲聊当结构的误判 |
+| P1 | 完善隐性结构推断的反证机制和置信度说明 |
+| P2 | 将 builder 类 prompt 与中间产物强绑定，减少自由发挥 |
+| P2 | 补齐测试样例、样本包和自动校验脚本 |
+
+## References
+
+[1]: https://github.com/titanwings/colleague-skill "titanwings/colleague-skill"
