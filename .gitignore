@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Local experiment scratch
+/tmp/
+tmp_*.json
+tmp_*.md
+
+# Ad-hoc local analysis helpers
+scripts/analyze_*.py
+
+# Organization-specific real materials and generated outputs
+organizations/*
+!organizations/.gitkeep
+
+# Local downloads and artifacts
+Downloads/

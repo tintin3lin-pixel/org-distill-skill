@@ -10,11 +10,13 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
+
 
 from models import EvidenceUnit, MaterialQuality
 
@@ -35,6 +37,8 @@ HEADER_KEYS = {
     "topic": ["topic", "subject", "title", "议题", "主题"],
     "conversation": ["conversation", "thread", "channel", "群", "chat"],
 }
+CHAT_CSV_REQUIRED_COLUMNS = {"talker", "msg", "CreateTime"}
+CHAT_CSV_OPTIONAL_COLUMNS = {"id", "MsgSvrID", "type_name", "is_sender", "src"}
 
 
 def now_iso() -> str:
@@ -210,6 +214,128 @@ def build_metadata(path: Path, category: str, header_map: dict[str, str], raw_te
     }
 
 
+def looks_like_chat_csv(path: Path) -> bool:
+    if path.suffix.lower() != ".csv":
+        return False
+    try:
+        with path.open("r", encoding="utf-8", newline="") as f:
+            reader = csv.DictReader(f)
+            fieldnames = reader.fieldnames or []
+    except UnicodeDecodeError:
+        with path.open("r", encoding="utf-8", errors="ignore", newline="") as f:
+            reader = csv.DictReader(f)
+            fieldnames = reader.fieldnames or []
+    if not fieldnames:
+        return False
+    field_set = set(fieldnames)
+    return CHAT_CSV_REQUIRED_COLUMNS.issubset(field_set)
+
+
+def normalize_chat_message_text(message_type: str, msg: str, src: str) -> tuple[str, str]:
+    raw_text = (msg or "").strip() or (src or "").strip()
+    message_type = (message_type or "text").strip().lower()
+    src = (src or "").strip()
+
+    if message_type == "text":
+        canonical = raw_text
+    elif message_type == "file":
+        label = raw_text or "[文件]"
+        canonical = f"{label} | 附件来源: {src}" if src and src not in label else label
+    elif message_type in {"image", "video", "voice", "sticker", "location"}:
+        base = raw_text or f"[{message_type}]"
+        canonical = f"{base} | 附加信息: {src}" if src else base
+    else:
+        canonical = raw_text or f"[{message_type}]"
+        if src:
+            canonical = f"{canonical} | 附加信息: {src}"
+
+    return raw_text or canonical, normalize_whitespace(canonical)
+
+
+def extract_mentions(text: str) -> list[str]:
+    candidates = re.findall(r"@([^\s\u2005:\n]{1,30})", text or "")
+    mentions: list[str] = []
+    for name in candidates:
+        cleaned = name.strip("@，,。.!！?:：；;[]()（）")
+        if cleaned and cleaned != "所有人" and cleaned not in mentions:
+            mentions.append(cleaned)
+    return mentions[:10]
+
+
+def build_chat_csv_units(org_dir: Path, category: str, path: Path) -> list[EvidenceUnit]:
+    relative_path = str(path.relative_to(org_dir))
+    source_type = CATEGORY_TO_SOURCE_TYPE.get(category, "unknown")
+    metadata_base = build_metadata(path, category, {}, safe_read_text(path, max_chars=3000))
+    conversation_id = path.stem
+    topic_hint = path.stem
+    context_hint = infer_context_hint(category, relative_path)
+    thread_hint = path.stem
+    units: list[EvidenceUnit] = []
+
+    try:
+        file_obj = path.open("r", encoding="utf-8", newline="")
+    except UnicodeDecodeError:
+        file_obj = path.open("r", encoding="utf-8", errors="ignore", newline="")
+
+    with file_obj as f:
+        reader = csv.DictReader(f)
+        for idx, row in enumerate(reader, start=1):
+            row = {key: (value or "") for key, value in (row or {}).items()}
+            talker = row.get("talker", "").strip()
+            message_type = row.get("type_name", "text").strip().lower() or "text"
+            msg = row.get("msg", "")
+            src = row.get("src", "")
+            raw_text, canonical_text = normalize_chat_message_text(message_type, msg, src)
+            if not talker and not canonical_text:
+                continue
+
+            timestamp = (row.get("CreateTime", "") or "").strip() or None
+            row_id = (row.get("id", "") or "").strip() or str(idx)
+            source_path = f"{relative_path}#row-{row_id}"
+            title_seed = canonical_text.splitlines()[0].strip() if canonical_text else f"{message_type} message"
+            title = f"{talker or 'unknown'}: {title_seed}"[:120]
+            participants = [talker] if talker else []
+            for mentioned in extract_mentions(canonical_text):
+                if mentioned not in participants:
+                    participants.append(mentioned)
+
+            row_metadata = {
+                **metadata_base,
+                "row_index": idx,
+                "row_id": row_id,
+                "message_server_id": (row.get("MsgSvrID", "") or "").strip() or None,
+                "message_type": message_type,
+                "is_sender": (row.get("is_sender", "") or "").strip() or None,
+                "attachment_src": src or None,
+                "csv_columns": sorted(set(reader.fieldnames or []) & (CHAT_CSV_REQUIRED_COLUMNS | CHAT_CSV_OPTIONAL_COLUMNS)),
+            }
+
+            units.append(
+                EvidenceUnit(
+                    unit_id=make_unit_id(source_type, source_path),
+                    source_type=source_type,
+                    source_path=source_path,
+                    title=title,
+                    timestamp_start=timestamp,
+                    timestamp_end=None,
+                    participants=participants,
+                    primary_speaker=talker or None,
+                    conversation_id=conversation_id,
+                    reply_to_unit_id=None,
+                    topic_hint=topic_hint,
+                    context_hint=context_hint,
+                    thread_hint=thread_hint,
+                    raw_text=raw_text,
+                    canonical_text=canonical_text,
+                    position_bias=None,
+                    material_quality="partial_context" if canonical_text else "surface_only",
+                    metadata=row_metadata,
+                )
+            )
+
+    return units
+
+
 def build_evidence_unit(org_dir: Path, category: str, path: Path) -> EvidenceUnit:
     relative_path = str(path.relative_to(org_dir))
     source_type = CATEGORY_TO_SOURCE_TYPE.get(category, "unknown")
@@ -260,7 +386,10 @@ def collect_evidence_units(org_dir: Path) -> list[EvidenceUnit]:
         if not category_dir.exists():
             continue
         for path in iter_supported_files(category_dir):
-            units.append(build_evidence_unit(org_dir, category, path))
+            if category == "messages" and looks_like_chat_csv(path):
+                units.extend(build_chat_csv_units(org_dir, category, path))
+            else:
+                units.append(build_evidence_unit(org_dir, category, path))
 
     return units
 
